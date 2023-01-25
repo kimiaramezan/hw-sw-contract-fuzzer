@@ -19,7 +19,7 @@ class intPorts():
         for attr in self.__slots__:
             setattr(self, attr, None)
 
-class tileAdapter():
+class tileAdapter(): #adapt to new instrumented dut structure with two tiles
     def __init__(self, dut, port_names, monitor, debug=False):
         self.dut = dut
         self.debug = debug

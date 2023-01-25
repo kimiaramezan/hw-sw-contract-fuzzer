@@ -46,6 +46,8 @@ class tileAdapter():
             if '_b_' in name:
                 protocol = TL_C
 
+        #TODO create two adapters for each copy of the instrumented dut, sort ports by "a_"/"b_" beforehand
+
         self.tl_adapter = tlAdapter(dut, tl_port_names, protocol, 64, debug)
 
         self.int_ports = intPorts()

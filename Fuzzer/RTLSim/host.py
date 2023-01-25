@@ -13,7 +13,7 @@ ILL_MEM = -1
 
 DRAM_BASE = 0x80000000
 
-class rtlInput():
+class rtlInput(): #TODO adapt to two inputs or two hexfiles?
     def __init__(self, hexfile, intrfile, data, symbols, max_cycles):
         self.hexfile = hexfile
         self.intrfile = intrfile
@@ -28,7 +28,9 @@ class rvRTLhost():
 
         paths = reader.return_map()
 
-        port_names = paths['port_names']
+        #TODO add more info categories: coverage output, observable signals (attacker model!), ...
+
+        port_names = paths['port_names'] 
         monitor_pc = paths['monitor_pc']
         monitor_valid = paths['monitor_valid']
         monitor = (monitor_pc[0], monitor_valid[0])
@@ -103,7 +105,7 @@ class rvRTLhost():
 
         fd.close()
 
-    def get_covsum(self):
+    def get_covsum(self): #TODO adapt to new coverage metric
         cov_mask = (1 << len(self.dut.io_covSum)) - 1
         return self.dut.io_covSum.value & cov_mask
 
@@ -137,7 +139,7 @@ class rvRTLhost():
         data = rtl_input.data
         data_addrs = []
         offset = 0
-        for n in range(6):
+        for n in range(6): #TODO maybe only different data section, where does second data come from?
             data_start = symbols['_random_data{}'.format(n)]
             data_end = symbols['_end_data{}'.format(n)]
             data_addrs.append((data_start, data_end))

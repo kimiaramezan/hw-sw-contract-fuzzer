@@ -33,7 +33,7 @@ class rvRTLhost():
         port_names = paths['port_names'] 
         monitor_pc = paths['monitor_pc']
         monitor_valid = paths['monitor_valid']
-        monitor = (monitor_pc[0], monitor_valid[0])
+        monitor = (monitor_pc, monitor_valid)
 
         self.rtl_sig_file = rtl_sig_file
         self.debug = debug

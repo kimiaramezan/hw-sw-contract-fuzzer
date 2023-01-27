@@ -13,7 +13,7 @@ INT_MTIP = 0x1
 INT_MSIP = 0x2
 
 class intPorts():
-    __slots__ = ('seip', 'meip', 'msip', 'mtip')
+    __slots__ = ('a_seip', 'a_meip', 'a_msip', 'a_mtip', 'b_seip', 'b_meip', 'b_msip', 'b_mtip')
 
     def __init__(self):
         for attr in self.__slots__:
@@ -25,10 +25,66 @@ class tileAdapter(): #adapt to new instrumented dut structure with two tiles
         self.debug = debug
         self.drive = False
 
+
+        #sort ports by "a_"/"b_" beforehand
+        port_names_a = []
+        port_names_b = []
+        other = []
+
+        for name in port_names:
+            if name[:2] == 'a_':
+                port_names_a.append(name)
+            elif name[:2] == 'b_':
+                port_names_b.append(name)
+            else:
+                other.append(name)
+
+        tl_port_names_a, int_port_names_a, reset_vector_port_a, others_a = self.sort_ports(port_names_a)
+
+        tl_port_names_b, int_port_names_b, reset_vector_port_b, others_b = self.sort_ports(port_names_b)
+
+        pc_names = monitor[0]
+        valid_names = monitor[1]
+
+        for name in tl_port_names_a:
+            if '_b_' in name:
+                protocol = TL_C
+
+        #create two adapters for each copy of the instrumented dut
+        self.tl_adapter_a = tlAdapter(dut, tl_port_names_a, protocol, 64, debug)
+        self.tl_adapter_b = tlAdapter(dut, tl_port_names_b, protocol, 64, debug)
+
+        self.int_ports = intPorts()
+        self.set_int_ports('a_', int_port_names_a)
+        self.set_int_ports('b_', int_port_names_b)
+
+        self.reset_vector_port_a = getattr(self.dut, reset_vector_port_a)
+        self.reset_vector_port_b = getattr(self.dut, reset_vector_port_b)
+
+        self.reset_vector = 0x10000
+        self.reset_vector_port_a <= self.reset_vector
+        self.reset_vector_port_b <= self.reset_vector
+
+        self.monitor_pc_a = getattr(self.dut, pc_names[0])
+        self.monitor_valid_a = getattr(self.dut, valid_names[0])
+
+        self.monitor_pc_b = getattr(self.dut, pc_names[1])
+        self.monitor_valid_b = getattr(self.dut, valid_names[1])
+
+        self.intr = 0
+
+    def set_int_ports(self, prefix, int_port_names):
+        for name in int_port_names:
+            if 'in_2_sync_0' in name: setattr(self.int_ports, prefix + 'seip', getattr(self.dut, name))
+            if 'in_1_sync_0' in name: setattr(self.int_ports, prefix + 'meip', getattr(self.dut, name))
+            if 'in_0_sync_0' in name: setattr(self.int_ports, prefix + 'msip', getattr(self.dut, name))
+            if 'in_0_sync_1' in name: setattr(self.int_ports, prefix + 'mtip', getattr(self.dut, name))
+
+
+    def sort_ports(self, port_names):
         tl_port_names = []
         int_port_names = []
         others = []
-
         for name in port_names:
             if '_tl_' in name:
                 tl_port_names.append(name)
@@ -39,33 +95,8 @@ class tileAdapter(): #adapt to new instrumented dut structure with two tiles
             else:
                 others.append(name)
 
-        pc_name = monitor[0]
-        valid_name = monitor[1]
+        return tl_port_names, int_port_names, reset_vector_port, others
 
-        for name in tl_port_names:
-            if '_b_' in name:
-                protocol = TL_C
-
-        #TODO create two adapters for each copy of the instrumented dut, sort ports by "a_"/"b_" beforehand
-
-        self.tl_adapter = tlAdapter(dut, tl_port_names, protocol, 64, debug)
-
-        self.int_ports = intPorts()
-        for name in int_port_names:
-            if 'in_2_sync_0' in name: setattr(self.int_ports, 'seip', getattr(self.dut, name))
-            if 'in_1_sync_0' in name: setattr(self.int_ports, 'meip', getattr(self.dut, name))
-            if 'in_0_sync_0' in name: setattr(self.int_ports, 'msip', getattr(self.dut, name))
-            if 'in_0_sync_1' in name: setattr(self.int_ports, 'mtip', getattr(self.dut, name))
-
-        self.reset_vector_port = getattr(self.dut, reset_vector_port)
-
-        self.reset_vector = 0x10000
-        self.reset_vector_port <= self.reset_vector
-
-        self.monitor_pc = getattr(self.dut, pc_name)
-        self.monitor_valid = getattr(self.dut, valid_name)
-
-        self.intr = 0
 
     def debug_print(self, message):
         if self.debug:
@@ -81,16 +112,21 @@ class tileAdapter(): #adapt to new instrumented dut structure with two tiles
         mtip = int((intr & INT_MTIP) == INT_MTIP)
         msip = int((intr & INT_MSIP) == INT_MSIP)
 
-        self.int_ports.seip <= seip
-        self.int_ports.meip <= meip
-        self.int_ports.msip <= msip
-        self.int_ports.mtip <= mtip
+        self.int_ports.a_seip <= seip
+        self.int_ports.a_meip <= meip
+        self.int_ports.a_msip <= msip
+        self.int_ports.a_mtip <= mtip
+
+        self.int_ports.b_seip <= seip
+        self.int_ports.b_meip <= meip
+        self.int_ports.b_msip <= msip
+        self.int_ports.b_mtip <= mtip
 
     def pc_valid(self):
-        return self.monitor_valid.value
+        return self.monitor_valid_a.value & self.monitor_valid_b.value
 
     @coroutine
-    def interrupt_handler(self, ints):
+    def interrupt_handler(self, ints): #TODO adapt interrupt to both copies
         if not ints:
             return
 
@@ -104,10 +140,10 @@ class tileAdapter(): #adapt to new instrumented dut structure with two tiles
             yield RisingEdge(self.dut.clock)
 
 
-    def probe_tohost(self, tohost_addr):
+    def probe_tohost(self, tohost_addr):  #TODO check what this does and adapt
         self.tl_adapter.probe_block(tohost_addr)
 
-    def check_assert(self):
+    def check_assert(self):  #TODO check what this does and adapt
         return self.dut.metaAssert.value
 
     def start(self, memory, ints):
@@ -115,16 +151,18 @@ class tileAdapter(): #adapt to new instrumented dut structure with two tiles
             raise Exception('RocketTile Adapter must receive address map to drive DUT')
 
         self.drive = True
-        self.tl_adapter.start(memory)
+        self.tl_adapter_a.start(memory)
+        self.tl_adapter_b.start(memory)
         self.intr_handler = cocotb.fork(self.interrupt_handler(ints))
 
     @coroutine
     def stop(self):
         self.drive = False
-        while self.tl_adapter.onGoing():
+        while self.tl_adapter_a.onGoing() & self.tl_adapter_b.onGoing():
             yield RisingEdge(self.dut.clock)
-        self.tl_adapter.stop()
-        while self.tl_adapter.isRunning():
+        self.tl_adapter_a.stop()
+        self.tl_adapter_b.stop()
+        while self.tl_adapter_a.isRunning() & self.tl_adapter_b.isRunning():
             yield RisingEdge(self.dut.clock)
 
         self.int_ports.seip <= 0

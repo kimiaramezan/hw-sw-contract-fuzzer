@@ -146,13 +146,13 @@ class tileAdapter(): #adapt to new instrumented dut structure with two tiles
     def check_assert(self):  #TODO check what this does and adapt
         return self.dut.metaAssert.value
 
-    def start(self, memory, ints):
-        if memory.__class__.__name__ != 'dict':
+    def start(self, memory_a, memory_b, ints): #two memory sections, containing both instructions and data
+        if memory_a.__class__.__name__ != 'dict' or memory_b.__class__.__name__ != 'dict':
             raise Exception('RocketTile Adapter must receive address map to drive DUT')
 
         self.drive = True
-        self.tl_adapter_a.start(memory)
-        self.tl_adapter_b.start(memory)
+        self.tl_adapter_a.start(memory_a)
+        self.tl_adapter_b.start(memory_b)
         self.intr_handler = cocotb.fork(self.interrupt_handler(ints))
 
     @coroutine

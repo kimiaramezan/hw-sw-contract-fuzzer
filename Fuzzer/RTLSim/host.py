@@ -14,10 +14,11 @@ ILL_MEM = -1
 DRAM_BASE = 0x80000000
 
 class rtlInput(): #TODO adapt to two inputs or two hexfiles?
-    def __init__(self, hexfile, intrfile, data, symbols, max_cycles):
+    def __init__(self, hexfile, intrfile, data_a, data_b, symbols, max_cycles):
         self.hexfile = hexfile
         self.intrfile = intrfile
-        self.data = data
+        self.data_a = data_a
+        self.data_b = data_b
         self.symbols = symbols
         self.max_cycles = max_cycles
 
@@ -136,17 +137,23 @@ class rvRTLhost():
         for addr in range(sig_start // 8 * 8, sig_end, 8):
             memory[addr] = 0
 
-        data = rtl_input.data
+        memory_a = memory
+        memory_b = memory.copy()
+
+        data_a = rtl_input.data_a #TODO different data sections
+        data_b = rtl_input.data_b
         data_addrs = []
         offset = 0
-        for n in range(6): #TODO maybe only different data section, where does second data come from?
+        for n in range(6): 
             data_start = symbols['_random_data{}'.format(n)]
             data_end = symbols['_end_data{}'.format(n)]
             data_addrs.append((data_start, data_end))
 
             for i, addr in enumerate(range(data_start // 8 * 8, data_end // 8 * 8, 8)):
-                word = data[i + offset]
-                memory[addr] = word
+                word = data_a[i + offset]
+                memory_a[addr] = word
+                word = data_b[i + offset]
+                memory_b[addr] = word
 
             offset += (data_end - data_start) // 8
 
@@ -165,12 +172,12 @@ class rvRTLhost():
 
         yield self.reset(clk, self.dut.metaReset, self.dut.reset)
 
-        self.adapter.start(memory, ints)
+        self.adapter.start(memory_a, memory_b, ints)
         for i in range(max_cycles):
             yield clkedge
 
             if i % 100 == 0:
-                tohost = memory[tohost_addr]
+                tohost = memory[tohost_addr] #TODO ???
                 if tohost:
                     break
                 else:
@@ -181,9 +188,13 @@ class rvRTLhost():
 
         # Check all the CPU's memory access operations occurs in DRAM
         mem_check = True
-        for addr in memory.keys():
+        for addr in memory_a.keys():
             if addr not in bootrom_addrs and addr < DRAM_BASE:
                 mem_check = False
+        for addr in memory_b.keys():
+            if addr not in bootrom_addrs and addr < DRAM_BASE:
+                mem_check = False
+
 
         if not mem_check:
             return (ILL_MEM, self.get_covsum())

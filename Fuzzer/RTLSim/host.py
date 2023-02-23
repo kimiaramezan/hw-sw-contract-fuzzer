@@ -13,7 +13,7 @@ ILL_MEM = -1
 
 DRAM_BASE = 0x80000000
 
-class rtlInput(): #TODO adapt to two inputs or two hexfiles?
+class rtlInput(): #GG now with two data sections
     def __init__(self, hexfile, intrfile, data_a, data_b, symbols, max_cycles):
         self.hexfile = hexfile
         self.intrfile = intrfile
@@ -38,6 +38,8 @@ class rvRTLhost():
 
         self.rtl_sig_file = rtl_sig_file
         self.debug = debug
+
+        self.cov_output = getattr(dut, "cov_" + toplevel)
 
         self.dut = dut
         self.adapter = tileAdapter(dut, port_names, monitor, self.debug)
@@ -106,9 +108,9 @@ class rvRTLhost():
 
         fd.close()
 
-    def get_covsum(self): #TODO adapt to new coverage metric
-        cov_mask = (1 << len(self.dut.io_covSum)) - 1
-        return self.dut.io_covSum.value & cov_mask
+    def get_covsum(self): #TODO adapt to new coverage metric, change to collect coverage every clockstep
+        #cov_mask = (1 << len(self.cov_output)) - 1
+        return self.cov_output.value# & cov_mask
 
     @coroutine
     def run_test(self, rtl_input: rtlInput, assert_intr: bool):
@@ -140,7 +142,7 @@ class rvRTLhost():
         memory_a = memory
         memory_b = memory.copy()
 
-        data_a = rtl_input.data_a #TODO different data sections
+        data_a = rtl_input.data_a #GG now handling two different data sections
         data_b = rtl_input.data_b
         data_addrs = []
         offset = 0

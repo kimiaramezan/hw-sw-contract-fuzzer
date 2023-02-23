@@ -4,6 +4,7 @@ import psutil
 import signal
 from threading import Timer
 
+from HSCSim.host import rvHSChost
 from ISASim.host import rvISAhost
 from RTLSim.host import rvRTLhost
 
@@ -66,6 +67,22 @@ def run_isa_test(isaHost, isa_input, stop, out, proc_num, assert_intr=False):
 
     return ret
 
+def run_hsc_test(isaHost, isa_input, stop, out, proc_num, assert_intr=False):#TODO adapt to sail
+    ret = proc_state.NORMAL
+   
+    timer = Timer(ISA_TIME_LIMIT, isa_timeout, [out, stop, proc_num])
+    timer.start()
+    isa_ret = isaHost.run_test(isa_input, assert_intr)
+    timer.cancel()
+
+    if stop[0] == proc_state.ERR_ISA_TIMEOUT:
+        stop[0] = proc_state.NORMAL
+        ret = proc_state.ERR_ISA_TIMEOUT
+    elif isa_ret != 0:
+        stop[0] = proc_state.ERR_ISA_ASSERT
+        ret = proc_state.ERR_ISA_ASSERT
+
+    return ret
 
 def debug_print(message, debug, highlight=False):
     if highlight:
@@ -109,3 +126,24 @@ def setup(dut, toplevel, template, out, proc_num, debug, minimizing=False, no_gu
     checker = sigChecker(isa_sigfile, rtl_sigfile, debug, minimizing)
 
     return (mutator, preprocessor, isaHost, rtlHost, checker)
+
+def setupHSC(dut, toplevel, template, out, proc_num, debug, minimizing=False, no_guide=False): #TODO adapt to sail
+    mutator = rvMutator(no_guide=no_guide)
+
+    cc = 'riscv64-unknown-elf-gcc'
+    elf2hex = 'riscv64-unknown-elf-elf2hex'
+    preprocessor = rvPreProcessor(cc, elf2hex, template, out, proc_num)
+
+    spike = os.environ['SPIKE']
+    isa_sigfile = out + '/.isa_sig_{}.txt'.format(proc_num)
+    rtl_sigfile = out + '/.rtl_sig_{}.txt'.format(proc_num)
+
+    if debug: spike_arg = ['-l']
+    else: spike_arg = []
+
+    hscHost = rvHSChost(spike, spike_arg, isa_sigfile)
+    rtlHost = rvRTLhost(dut, toplevel, rtl_sigfile, debug=debug)
+
+    checker = sigChecker(isa_sigfile, rtl_sigfile, debug, minimizing)
+
+    return (mutator, preprocessor, hscHost, rtlHost, checker)

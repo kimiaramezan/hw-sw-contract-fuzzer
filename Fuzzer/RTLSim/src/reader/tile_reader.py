@@ -20,7 +20,7 @@ class tileSrcReader():
                     if not val_line: break
                     elif '  ' != val_line[0:2]: break
 
-                    self.name_map[key].append(val_line[2:-1])
+                    self.name_map[key].append(val_line.strip())
 
                 if not val_line: break
                 elif val_line != '\n':

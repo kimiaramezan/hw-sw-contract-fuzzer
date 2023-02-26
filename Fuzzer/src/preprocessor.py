@@ -102,7 +102,7 @@ class rvPreProcessor():
     def process(self, sim_input: simInput, data_a: list, data_b: list, intr: bool, num_data_sections=6): #TODO check this section, especially for data
         section_size = len(data_a) // num_data_sections
 
-        assert section_size == len(data_b), 'data sections have to be of equal length'
+        assert len(data_a) == len(data_b), 'data sections have to be of equal length'
         assert data_a, 'Empty data can not be processed'
         assert (section_size & (section_size - 1)) == 0, \
             'Number of memory blocks should be power of 2'

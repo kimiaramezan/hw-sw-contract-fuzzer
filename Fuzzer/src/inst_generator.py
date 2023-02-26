@@ -9,7 +9,7 @@ Generates syntactically, semantically desirable unit of instructions
 
 Properties
  2. Compilable
- 1. Guarantee forward progress and end (No loop)
+ 1. Guarantee forward progress and end (No loop) #TODO check this and change?
 """
 class rvInstGenerator():
     def __init__(self, isa='RV64G'):

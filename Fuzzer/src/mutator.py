@@ -4,6 +4,8 @@ from copy import deepcopy
 
 from inst_generator import Word, rvInstGenerator, PREFIX, MAIN, SUFFIX
 
+#TODO adapt mutator to new data generation -> two executables/data sections/ change si file configuration, importance of data sections higher here
+
 """ Mutation phases """
 GENERATION = 0
 MUTATION   = 1
@@ -111,7 +113,7 @@ class rvMutator():
 
         self.inst_generator = rvInstGenerator('RV64G')
 
-    def add_data(self, new_data=[]):
+    def add_data(self, new_data=[]): #TODO add data mutation
         if len(self.data_seeds) == self.max_data:
             seed = self.data_seeds.pop(0)
         else:

@@ -20,8 +20,8 @@ def Run(dut, toplevel,
 
     random.seed(time.time() * (proc_num + 1))
 
-    (mutator, preprocessor, isaHost, rtlHost, checker) = \
-        setup(dut, toplevel, template, out, proc_num, debug, no_guide=no_guide)
+    (mutator, preprocessor, hscHost, rtlHost, checker) = \
+        setupHSC(dut, toplevel, template, out, proc_num, debug, no_guide=no_guide)
 
     if in_file: num_iter = 1
 
@@ -49,7 +49,7 @@ def Run(dut, toplevel,
         if random.random() < prob_intr:
             assert_intr = True
 
-        if in_file: (sim_input, data, assert_intr) = mutator.read_siminput(in_file)
+        if in_file: (sim_input, data, assert_intr) = mutator.read_siminput(in_file) #TODO generate two data sections
         else: (sim_input, data) = mutator.get(assert_intr)
 
         if debug:
@@ -57,10 +57,10 @@ def Run(dut, toplevel,
             for inst, INT in zip(sim_input.get_insts(), sim_input.ints + [0]):
                 print('{:<50}{:04b}'.format(inst, INT))
 
-        (isa_input, rtl_input, symbols) = preprocessor.process(sim_input, data, assert_intr)
+        (hsc_input, rtl_input, symbols) = preprocessor.process(sim_input, data, data, assert_intr) #TODO switch to different data sections
 
-        if isa_input and rtl_input:
-            ret = run_isa_test(isaHost, isa_input, stop, out, proc_num)
+        if hsc_input and rtl_input:
+            ret = run_hsc_test(hscHost, hsc_input, stop, out, proc_num)
             if ret == proc_state.ERR_ISA_TIMEOUT: continue
             elif ret == proc_state.ERR_ISA_ASSERT: break
 
@@ -73,8 +73,8 @@ def Run(dut, toplevel,
             if assert_intr and ret == SUCCESS:
                 (intr_prv, epc) = checker.check_intr(symbols)
                 if epc != 0:
-                    preprocessor.write_isa_intr(isa_input, rtl_input, epc)
-                    ret = run_isa_test(isaHost, isa_input, stop, out, proc_num, True)
+                    preprocessor.write_isa_intr(hsc_input, rtl_input, epc)
+                    ret = run_isa_test(hscHost, hsc_input, stop, out, proc_num, True)
                     if ret == proc_state.ERR_ISA_TIMEOUT: continue
                     elif ret == proc_state.ERR_ISA_ASSERT: break
                 else: continue

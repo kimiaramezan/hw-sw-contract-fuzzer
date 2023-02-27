@@ -121,7 +121,7 @@ class rvRTLhost():
         fd = open(rtl_input.hexfile, 'r')
         lines = fd.readlines()
         fd.close()
-        self.debug_print('[RTLHost] Start RTL simulation')
+
         max_cycles = rtl_input.max_cycles
 
         symbols = rtl_input.symbols
@@ -169,22 +169,15 @@ class rvRTLhost():
             for pair in intr_pairs:
                 ints[int(pair[0], 16)] = int(pair[1], 2)
 
-        clk_a = self.dut.a_clock
-        clk_driver_a = cocotb.fork(self.clock_gen(clk_a))
-        clkedge_a = RisingEdge(clk_a)
+        clk = self.dut.clock
+        clk_driver = cocotb.fork(self.clock_gen(clk))
+        clkedge = RisingEdge(clk)
 
-        yield self.reset(clk_a, self.dut.a_reset)
+        yield self.reset(clk, self.dut.reset)
 
-        clk_b = self.dut.b_clock
-        clk_driver_b = cocotb.fork(self.clock_gen(clk_b))
-        clkedge_b = RisingEdge(clk_b)
-
-        yield self.reset(clk_b, self.dut.b_reset)
-        print("start adapter with memory")
         self.adapter.start(memory_a, memory_b, ints)
         for i in range(max_cycles):
-            yield clkedge_a
-            yield clkedge_b
+            yield clkedge
 
             if i % 100 == 0:
                 tohost = memory[tohost_addr] #TODO ???
@@ -194,8 +187,7 @@ class rvRTLhost():
                     self.adapter.probe_tohost(tohost_addr)
 
         yield self.adapter.stop()
-        clk_driver_a.kill()
-        clk_driver_b.kill()
+        clk_driver.kill()
 
         # Check all the CPU's memory access operations occurs in DRAM
         mem_check = True

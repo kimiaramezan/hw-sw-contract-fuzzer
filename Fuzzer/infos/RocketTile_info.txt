@@ -1,6 +1,6 @@
 port_names
-    a_clock
-    a_reset
+    clock
+    reset
     a_auto_intsink_in_sync_0
     a_auto_int_in_xing_in_2_sync_0
     a_auto_int_in_xing_in_1_sync_0
@@ -53,8 +53,6 @@ port_names
     a_auto_halt_out_0
     a_auto_reset_vector_in
     a_auto_hartid_in
-    b_clock
-    b_reset
     b_auto_intsink_in_sync_0
     b_auto_int_in_xing_in_2_sync_0
     b_auto_int_in_xing_in_1_sync_0

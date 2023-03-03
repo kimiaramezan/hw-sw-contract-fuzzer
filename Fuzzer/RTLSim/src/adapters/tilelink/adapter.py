@@ -307,7 +307,7 @@ class tlAdapter():
 
         ongoings = {} # On going TL-A transactions (src - count)
 
-        a_ports.ready <= 1
+        a_ports.ready.value = 1
         while self.drive:
             if a_ports.fire():
                 opcode = a_ports.get('opcode')
@@ -526,7 +526,7 @@ class tlAdapter():
 
             yield clkedge
 
-        a_ports.ready <= 0
+        a_ports.ready.value = 0
 
     @coroutine
     def c_port_monitor(self, memory, block_perm, b_srcs, b_callback):
@@ -536,7 +536,7 @@ class tlAdapter():
 
         ongoings = {} # On going transactions (src - count)
 
-        c_ports.ready <= 1
+        c_ports.ready.value = 1
         while self.drive:
             if c_ports.fire():
                 opcode = c_ports.get('opcode')
@@ -613,7 +613,7 @@ class tlAdapter():
 
             yield clkedge
 
-        c_ports.ready <= 0
+        c_ports.ready.value = 0
 
     @coroutine
     def e_port_monitor(self, memory, d_sinks):
@@ -621,7 +621,7 @@ class tlAdapter():
         clkedge = RisingEdge(self.dut.clock)
         e_ports = self.e_ports
 
-        e_ports.ready <= 1
+        e_ports.ready.value = 1
         while self.drive:
             if e_ports.fire():
                 sink = e_ports.get('sink')
@@ -630,7 +630,7 @@ class tlAdapter():
 
             yield clkedge
 
-        e_ports.ready <= 0
+        e_ports.ready.value = 0
 
     @coroutine
     def d_port_driver(self):
@@ -648,22 +648,22 @@ class tlAdapter():
                     if callback:
                         callback.call()
 
-                    d_ports.opcode <= msg.opcode
-                    d_ports.param <= msg.param
-                    d_ports.size <= msg.size
-                    d_ports.source <= msg.source
-                    d_ports.sink <= msg.sink
-                    d_ports.data <= msg.data
-                    d_ports.corrupt <= msg.corrupt
-                    d_ports.denied <= msg.denied
+                    d_ports.opcode.value = msg.opcode
+                    d_ports.param.value = msg.param
+                    d_ports.size.value = msg.size
+                    d_ports.source.value = msg.source
+                    d_ports.sink.value = msg.sink
+                    d_ports.data.value = msg.data
+                    d_ports.corrupt.value = msg.corrupt
+                    d_ports.denied.value = msg.denied
 
-                    d_ports.valid <= 1
+                    d_ports.valid.value = 1
                     yield clkedge
                     while not d_ports.fire():
                         yield clkedge
 
                     d_ports.clear()
-                    d_ports.valid <= 0
+                    d_ports.valid.value = 0
 
                 else:
                     yield clkedge
@@ -683,21 +683,21 @@ class tlAdapter():
             if not self.b_queue.empty():
                 msg = self.b_queue.pop()
                 if msg:
-                    b_ports.opcode <= msg.opcode
-                    b_ports.param <= msg.param
-                    b_ports.size <= msg.size
-                    b_ports.source <= msg.source
-                    b_ports.address <= msg.address
-                    b_ports.mask <= msg.mask
-                    b_ports.data <= msg.data
+                    b_ports.opcode.value = msg.opcode
+                    b_ports.param.value = msg.param
+                    b_ports.size.value = msg.size
+                    b_ports.source.value = msg.source
+                    b_ports.address.value = msg.address
+                    b_ports.mask.value = msg.mask
+                    b_ports.data.value = msg.data
 
-                    b_ports.valid <= 1
+                    b_ports.valid.value = 1
                     yield clkedge
                     while not b_ports.fire():
                         yield clkedge
 
                     b_ports.clear()
-                    b_ports.valid <= 0
+                    b_ports.valid.value = 0
 
                 else:
                     yield clkedge

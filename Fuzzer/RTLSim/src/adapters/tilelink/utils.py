@@ -49,7 +49,7 @@ class Ports:
     def clear(self):
         for field in self.bit_fields:
             port = getattr(self, field)
-            port <= 0
+            port.value = 0
 
 
 """ CallBack functions which tilelink adapter should run """

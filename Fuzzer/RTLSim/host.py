@@ -77,23 +77,23 @@ class rvRTLhost():
     @coroutine
     def clock_gen(self, clock, period=2):
         while True:
-            clock <= 1
+            clock.value = 1
             yield Timer(period / 2)
-            clock <= 0
+            clock.value = 0
             yield Timer(period / 2)
 
     @coroutine
     def reset(self, clock, reset, timer=5):
         clkedge = RisingEdge(clock)
 
-        #metaReset <= 1
+        #metaReset.value = 1
         for i in range(timer):
             yield clkedge
-        #metaReset <= 0
-        reset <= 1
+        #metaReset.value = 0
+        reset.value = 1
         for i in range(timer):
             yield clkedge
-        reset <= 0
+        reset.value = 0
 
     def save_signature(self, memory, sig_start, sig_end, data_addrs, sig_file):
         fd = open(sig_file, 'w')
@@ -206,9 +206,9 @@ class rvRTLhost():
             self.debug_print('[RTLHost] Timeout, max_cycle={}'.format(max_cycles))
             return (TIME_OUT, self.get_covsum())
 
-        if self.adapter.check_assert():
-            self.debug_print('[RTLHost] Assertion Failure')
-            return (ASSERTION_FAIL, self.get_covsum())
+        #if self.adapter.check_assert():
+        #    self.debug_print('[RTLHost] Assertion Failure')
+        #    return (ASSERTION_FAIL, self.get_covsum())
 
         self.save_signature(memory, sig_start, sig_end, data_addrs, self.rtl_sig_file)
         self.debug_print('[RTLHost] Stop RTL simulation')

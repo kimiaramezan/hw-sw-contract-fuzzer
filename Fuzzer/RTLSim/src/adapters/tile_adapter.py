@@ -62,8 +62,8 @@ class tileAdapter(): #adapt to new instrumented dut structure with two tiles
         self.reset_vector_port_b = getattr(self.dut, reset_vector_port_b)
 
         self.reset_vector = 0x10000
-        self.reset_vector_port_a <= self.reset_vector
-        self.reset_vector_port_b <= self.reset_vector
+        self.reset_vector_port_a.value = self.reset_vector
+        self.reset_vector_port_b.value = self.reset_vector
 
         self.monitor_pc_a = getattr(self.dut, pc_names[0])
         self.monitor_valid_a = getattr(self.dut, valid_names[0])
@@ -112,15 +112,15 @@ class tileAdapter(): #adapt to new instrumented dut structure with two tiles
         mtip = int((intr & INT_MTIP) == INT_MTIP)
         msip = int((intr & INT_MSIP) == INT_MSIP)
 
-        self.int_ports.a_seip <= seip
-        self.int_ports.a_meip <= meip
-        self.int_ports.a_msip <= msip
-        self.int_ports.a_mtip <= mtip
+        self.int_ports.a_seip.value = seip
+        self.int_ports.a_meip.value = meip
+        self.int_ports.a_msip.value = msip
+        self.int_ports.a_mtip.value = mtip
 
-        self.int_ports.b_seip <= seip
-        self.int_ports.b_meip <= meip
-        self.int_ports.b_msip <= msip
-        self.int_ports.b_mtip <= mtip
+        self.int_ports.b_seip.value = seip
+        self.int_ports.b_meip.value = meip
+        self.int_ports.b_msip.value = msip
+        self.int_ports.b_mtip.value = mtip
 
     def pc_valid(self):
         return self.monitor_valid_a.value & self.monitor_valid_b.value
@@ -141,7 +141,8 @@ class tileAdapter(): #adapt to new instrumented dut structure with two tiles
 
 
     def probe_tohost(self, tohost_addr):  #TODO check what this does and adapt
-        self.tl_adapter.probe_block(tohost_addr)
+        self.tl_adapter_a.probe_block(tohost_addr)
+        self.tl_adapter_b.probe_block(tohost_addr)
 
     def check_assert(self):  #TODO check what this does and adapt
         return self.dut.metaAssert.value
@@ -165,9 +166,14 @@ class tileAdapter(): #adapt to new instrumented dut structure with two tiles
         while self.tl_adapter_a.isRunning() & self.tl_adapter_b.isRunning():
             yield RisingEdge(self.dut.clock)
 
-        self.int_ports.seip <= 0
-        self.int_ports.meip <= 0
-        self.int_ports.msip <= 0
-        self.int_ports.mtip <= 0
+        self.int_ports.a_seip.value = 0
+        self.int_ports.a_meip.value = 0
+        self.int_ports.a_msip.value = 0
+        self.int_ports.a_mtip.value = 0
+
+        self.int_ports.b_seip.value = 0
+        self.int_ports.b_meip.value = 0
+        self.int_ports.b_msip.value = 0
+        self.int_ports.b_mtip.value = 0
 
         self.intr = 0

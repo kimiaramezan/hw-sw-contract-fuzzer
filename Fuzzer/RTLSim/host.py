@@ -3,6 +3,9 @@ import cocotb
 
 from cocotb.decorators import coroutine
 from cocotb.triggers import Timer, RisingEdge
+from bitarray import bitarray
+from hashlib import shake_128
+from itertools import repeat
 from reader.tile_reader import tileSrcReader
 from adapters.tile_adapter import tileAdapter
 
@@ -43,6 +46,8 @@ class rvRTLhost():
 
         self.dut = dut
         self.adapter = tileAdapter(dut, port_names, monitor, self.debug)
+
+        self.coverage = bitarray(repeat(0,2 ** 16))
 
     def debug_print(self, message):
         if self.debug:
@@ -94,6 +99,11 @@ class rvRTLhost():
         for i in range(timer):
             yield clkedge
         reset.value = 0
+    
+    def cov_gen(self):
+        idx = int.from_bytes(shake_128(self.cov_output.value.buff).digest(2), byteorder='big')
+        #self.debug_print('idx: {}'.format(idx))
+        self.coverage[idx] = 1
 
     def save_signature(self, memory, sig_start, sig_end, data_addrs, sig_file):
         fd = open(sig_file, 'w')
@@ -110,8 +120,8 @@ class rvRTLhost():
 
     def get_covsum(self): #TODO adapt to new coverage metric, change to collect coverage every clockstep
         #cov_mask = (1 << len(self.cov_output)) - 1
-        print("ATTENTION {}".format(self.cov_output.value))
-        return self.cov_output.value# & cov_mask
+        #print("ATTENTION {}".format(self.cov_output.value))
+        return self.coverage
 
     @coroutine
     def run_test(self, rtl_input: rtlInput, assert_intr: bool):
@@ -178,7 +188,7 @@ class rvRTLhost():
         self.adapter.start(memory_a, memory_b, ints)
         for i in range(max_cycles):
             yield clkedge
-
+            self.cov_gen()
             if i % 100 == 0:
                 tohost = memory[tohost_addr] #TODO ???
                 if tohost:

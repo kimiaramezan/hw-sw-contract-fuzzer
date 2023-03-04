@@ -66,7 +66,8 @@ def Run(dut, toplevel,
 
             try:
                 (ret, coverage) = yield rtlHost.run_test(rtl_input, assert_intr)
-                coverage = coverage.binstr.count('0')
+                coverage = coverage.count(1)
+                debug_print("cov:{}".format(coverage), debug, False)
             except Exception as e:
                 debug_print('[RTLHost] exception {}'.format(e), debug, True)
                 stop[0] = proc_state.ERR_RTL_SIM

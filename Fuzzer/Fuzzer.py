@@ -50,15 +50,15 @@ def Run(dut, toplevel,
         if random.random() < prob_intr:
             assert_intr = True
 
-        if in_file: (sim_input, data, assert_intr) = mutator.read_siminput(in_file) #TODO generate two data sections
-        else: (sim_input, data) = mutator.get(assert_intr)
+        if in_file: (sim_input, data, assert_intr) = mutator.read_siminput(in_file) #TODO read/write two data sections
+        else: (sim_input, (data_a, data_b )) = mutator.get(assert_intr)
 
         if debug:
             print('[DifuzzRTL] Fuzz Instructions')
             for inst, INT in zip(sim_input.get_insts(), sim_input.ints + [0]):
                 print('{:<50}{:04b}'.format(inst, INT))
 
-        (hsc_input, rtl_input, symbols) = preprocessor.process(sim_input, data, data, assert_intr) #TODO switch to different data sections
+        (hsc_input, rtl_input, symbols) = preprocessor.process(sim_input, data_a, data_b, assert_intr)
 
         if hsc_input and rtl_input:
             ret = run_hsc_test(hscHost, hsc_input, stop, out, proc_num)

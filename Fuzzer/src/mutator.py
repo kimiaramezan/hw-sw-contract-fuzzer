@@ -55,8 +55,12 @@ class simInput():
             fd.write('{:<50}\n'.format(inst))
 
         if data:
-            fd.write('data:\n')
-            for word in data:
+            (a, b) = data
+            fd.write('data_a:\n')
+            for word in a:
+                fd.write('{:016x}\n'.format(word))
+            fd.write('data_b:\n')
+            for word in b:
                 fd.write('{:016x}\n'.format(word))
 
         fd.close()
@@ -119,10 +123,11 @@ class rvMutator():
         else:
             seed = len(self.data_seeds)
 
-        if new_data:
+        if new_data[0] and new_data[1]:
             self.random_data[seed] = new_data
         else:
-            self.random_data[seed] = [ random.randint(0, 0xffffffffffffffff) for i in range(64 * 6)] # TODO, Num_data_sections = 6
+            self.random_data[seed] =   ([random.randint(0, 0xffffffffffffffff) for i in range(64 * 6)],
+                                        [random.randint(0, 0xffffffffffffffff) for i in range(64 * 6)]) # TODO, Num_data_sections = 6
         self.data_seeds.append(seed)
 
         return seed
@@ -168,7 +173,7 @@ class rvMutator():
         prefix_tuples = []
         word_tuples = []
         suffix_tuples = []
-        data = []
+        data = ([],[])
 
         num_prefix = 0
         num_word = 0
@@ -185,13 +190,19 @@ class rvMutator():
             try: line = lines.pop(0)
             except: break
 
-            if 'data:' in line:
+            if 'data_a:' in line:
                 part = None
                 while True:
                     try: word = lines.pop(0)
                     except: break
-
-                    data.append(int(word, 16))
+                    if not 'data_b:' in word:
+                        data[0].append(int(word, 16))
+                    else:
+                        while True:
+                            try: word = lines.pop(0)
+                            except: break
+                            data[1].append(int(word, 16))
+                        break
                 break
             elif line[:2] == PREFIX:
                 part = PREFIX

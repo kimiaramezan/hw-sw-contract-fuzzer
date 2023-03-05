@@ -47,7 +47,8 @@ class rvRTLhost():
         self.dut = dut
         self.adapter = tileAdapter(dut, port_names, monitor, self.debug)
 
-        self.coverage = bitarray(repeat(0,2 ** 16))
+        self.coverage_map = bitarray(repeat(0,2 ** 16))
+        self.coverage_bits = -1
 
     def debug_print(self, message):
         if self.debug:
@@ -101,9 +102,15 @@ class rvRTLhost():
         reset.value = 0
     
     def cov_gen(self):
-        idx = int.from_bytes(shake_128(self.cov_output.value.buff).digest(2), byteorder='big')
+        idx = 1#int.from_bytes(shake_128(self.cov_output.value.buff).digest(2), byteorder='big')
         #self.debug_print('idx: {}'.format(idx))
-        self.coverage[idx] = 1
+        self.coverage_map[idx] = 1
+
+        if self.coverage_bits != -1:
+            self.coverage_bits = self.coverage_bits & self.cov_output.value
+            #self.debug_print("cov_bits:{},{}".format(self.coverage_bits, type(self.coverage_bits)))
+        else:
+            self.coverage_bits = self.cov_output.value
 
     def save_signature(self, memory, sig_start, sig_end, data_addrs, sig_file):
         fd = open(sig_file, 'w')
@@ -121,7 +128,7 @@ class rvRTLhost():
     def get_covsum(self): #TODO adapt to new coverage metric, change to collect coverage every clockstep
         #cov_mask = (1 << len(self.cov_output)) - 1
         #print("ATTENTION {}".format(self.cov_output.value))
-        return self.coverage
+        return (self.coverage_bits, self.coverage_map)
 
     @coroutine
     def run_test(self, rtl_input: rtlInput, assert_intr: bool):

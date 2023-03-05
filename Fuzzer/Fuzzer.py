@@ -1,5 +1,6 @@
 import time
 import random
+from bitarray import bitarray
 
 from cocotb.decorators import coroutine
 from RTLSim.host import ILL_MEM, SUCCESS, TIME_OUT, ASSERTION_FAIL
@@ -65,8 +66,10 @@ def Run(dut, toplevel,
             elif ret == proc_state.ERR_ISA_ASSERT: break
 
             try:
-                (ret, coverage) = yield rtlHost.run_test(rtl_input, assert_intr)
-                coverage = coverage.count(1)
+                (ret, (cov_bits, cov_map)) = yield rtlHost.run_test(rtl_input, assert_intr)
+                b = bitarray()
+                b.frombytes(cov_bits.to_bytes(length=217, byteorder='big'))
+                coverage = b.count(0)
                 debug_print("cov:{}".format(coverage), debug, False)
             except Exception as e:
                 debug_print('[RTLHost] exception {}'.format(e), debug, True)

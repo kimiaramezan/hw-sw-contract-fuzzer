@@ -67,9 +67,15 @@ def run_isa_test(isaHost, isa_input, stop, out, proc_num, assert_intr=False):
 
     return ret
 
-def run_hsc_test(isaHost, isa_input, stop, out, proc_num, assert_intr=False):#TODO adapt to sail
-    ret = proc_state.NORMAL
-    return ret
+def run_hsc_test(hscHost, hsc_input, stop, out, proc_num, assert_intr=False):#TODO adapt to sail: execute, perform check on 
+    equal = hscHost.run_test(hsc_input)
+
+    if not equal:
+        return proc_state.ERR_ISA_ASSERT
+
+    return proc_state.NORMAL
+
+    # TODO maybe implement timeout stuff
     # timer = Timer(ISA_TIME_LIMIT, isa_timeout, [out, stop, proc_num])
     # timer.start()
     # isa_ret = isaHost.run_test(isa_input, assert_intr)
@@ -134,16 +140,18 @@ def setupHSC(dut, toplevel, template, out, proc_num, debug, minimizing=False, no
     elf2hex = 'riscv64-unknown-elf-elf2hex'
     preprocessor = rvPreProcessor(cc, elf2hex, template, out, proc_num)
 
-    spike = os.environ['SPIKE']
-    isa_sigfile = out + '/.isa_sig_{}.txt'.format(proc_num)
+    sail = os.environ['SAIL']
+    hsc_outfiles = (out + '/.hsc_out_{}_a.txt'.format(proc_num), out + '/.hsc_out_{}_b.txt'.format(proc_num))
     rtl_sigfile = out + '/.rtl_sig_{}.txt'.format(proc_num)
 
-    if debug: spike_arg = ['-l']
-    else: spike_arg = []
+    if debug: sail_arg = []
+    else: sail_arg = ['-V']
 
-    hscHost = rvHSChost(spike, spike_arg, isa_sigfile)
+    sail_arg += ['-L', 'ct']
+
+    hscHost = rvHSChost(sail, sail_arg, hsc_outfiles, debug=debug)
     rtlHost = rvRTLhost(dut, toplevel, rtl_sigfile, debug=debug)
 
-    checker = sigChecker(isa_sigfile, rtl_sigfile, debug, minimizing)
+    checker = sigChecker(hsc_outfiles, rtl_sigfile, debug, minimizing)
 
     return (mutator, preprocessor, hscHost, rtlHost, checker)

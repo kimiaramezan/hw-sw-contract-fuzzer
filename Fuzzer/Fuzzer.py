@@ -50,7 +50,7 @@ def Run(dut, toplevel,
         if random.random() < prob_intr:
             assert_intr = True
 
-        if in_file: (sim_input, data, assert_intr) = mutator.read_siminput(in_file) #TODO read/write two data sections
+        if in_file: (sim_input, (data_a, data_b ), assert_intr) = mutator.read_siminput(in_file) #TODO read/write two data sections
         else: (sim_input, (data_a, data_b )) = mutator.get(assert_intr)
 
         if debug:
@@ -63,7 +63,9 @@ def Run(dut, toplevel,
         if hsc_input and rtl_input:
             ret = run_hsc_test(hscHost, hsc_input, stop, out, proc_num)
             if ret == proc_state.ERR_ISA_TIMEOUT: continue
-            elif ret == proc_state.ERR_ISA_ASSERT: break
+            elif ret == proc_state.ERR_ISA_ASSERT: 
+                debug_print('[ISAHost] contract distinguishable', debug, True)
+                continue
 
             try:
                 (ret, (cov_bits, cov_map)) = yield rtlHost.run_test(rtl_input, assert_intr)

@@ -120,8 +120,7 @@ class rvPreProcessor():
                                    '{}/include/v/string.c'.format(self.template),
                                    '{}/include/v/vm.c'.format(self.template) ]
 
-        si_name_a = self.base + '/.input_{}_a.si'.format(self.proc_num)
-        si_name_b = self.base + '/.input_{}_b.si'.format(self.proc_num)
+        si_name = self.base + '/.input_{}.si'.format(self.proc_num)
         asm_name_a = self.base + '/.input_{}_a.S'.format(self.proc_num)
         asm_name_b = self.base + '/.input_{}_b.S'.format(self.proc_num)
         elf_name_a = self.base + '/.input_{}_a.elf'.format(self.proc_num)
@@ -143,8 +142,7 @@ class rvPreProcessor():
             else:
                 ints.append(INT)
 
-        sim_input.save(si_name_a, data_a)
-        sim_input.save(si_name_b, data_b)
+        sim_input.save(si_name, (data_a, data_b))
 
         fd = open(test_template, 'r')
         template_lines = fd.readlines()

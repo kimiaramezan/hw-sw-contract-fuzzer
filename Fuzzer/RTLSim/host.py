@@ -197,8 +197,10 @@ class rvRTLhost():
             yield clkedge
             self.cov_gen()
             if i % 100 == 0:
-                tohost = memory[tohost_addr] #TODO ???
-                if tohost:
+                tohost_a = memory_a[tohost_addr]
+                tohost_b = memory_b[tohost_addr] 
+                if tohost_a and tohost_b:
+                    self.debug_print('[RTLHost] RTL simulation finished correctly')
                     break
                 else:
                     self.adapter.probe_tohost(tohost_addr)

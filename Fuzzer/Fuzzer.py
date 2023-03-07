@@ -98,7 +98,7 @@ def Run(dut, toplevel,
                             format(iNum), debug, True)
                 if record:
                     save_mismatch(out, proc_num, out + '/illegal',
-                                  sim_input, data, iNum)
+                                  sim_input, (data_a, data_b ), iNum)
                 iNum += 1
 
             if not match or ret not in [SUCCESS, ILL_MEM]:
@@ -108,7 +108,7 @@ def Run(dut, toplevel,
 
                 if record:
                     save_mismatch(out, proc_num, out + '/mismatch',
-                                  sim_input, data, mNum)
+                                  sim_input, (data_a, data_b ), mNum)
 
                 mNum += 1
                 if ret == TIME_OUT: cause = 'Timeout'
@@ -118,7 +118,7 @@ def Run(dut, toplevel,
                 debug_print('[DifuzzRTL] Bug -- {} [{}]'. \
                             format(mNum, cause), debug, not match or (ret != SUCCESS))
 
-            if coverage > last_coverage:
+            if coverage > last_coverage: #TODO change to 'new bit flipped'
                 if multicore:
                     cNum = manager.read_num('cNum')
                     manager.write_num('cNum', cNum + 1)

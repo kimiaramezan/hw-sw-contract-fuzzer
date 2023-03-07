@@ -1,5 +1,6 @@
 import os
 import shutil
+from typing import Tuple
 import psutil
 import signal
 from threading import Timer
@@ -101,16 +102,20 @@ def save_file(file_name, mode, line):
     fd.write(line)
     fd.close()
 
-def save_mismatch(base, proc_num, out, sim_input: simInput, data: list, num): #, elf, asm, hexfile, mNum):
+def save_mismatch(base, proc_num, out, sim_input: simInput, data: Tuple[list, list], num): #, elf, asm, hexfile, mNum):
     sim_input.save(out + '/sim_input/id_{}.si'.format(num), data)
 
-    elf = base + '/.input_{}.elf'.format(proc_num)
-    asm = base + '/.input_{}.S'.format(proc_num)
-    hexfile = base + '/.input_{}.hex'.format(proc_num)
+    asm_name_a = base + '/.input_{}_a.S'.format(proc_num)
+    asm_name_b = base + '/.input_{}_b.S'.format(proc_num)
+    elf_name_a = base + '/.input_{}_a.elf'.format(proc_num)
+    elf_name_b = base + '/.input_{}_b.elf'.format(proc_num)
+    hex_name = base + '/.input_{}.hex'.format(proc_num)
 
-    shutil.copy(elf, out + '/elf/id_{}.elf'.format(num))
-    shutil.copy(asm, out + '/asm/id_{}.S'.format(num))
-    shutil.copy(hexfile, out + '/hex/id_{}.hex'.format(num))
+    shutil.copy(asm_name_a, out + '/asm/id_{}_a.S'.format(num))
+    shutil.copy(asm_name_b, out + '/asm/id_{}_b.S'.format(num))
+    shutil.copy(elf_name_a, out + '/elf/id_{}_a.elf'.format(num))
+    shutil.copy(elf_name_b, out + '/elf/id_{}_b.elf'.format(num))
+    shutil.copy(hex_name, out + '/hex/id_{}.hex'.format(num))
 
 def setup(dut, toplevel, template, out, proc_num, debug, minimizing=False, no_guide=False):
     mutator = rvMutator(no_guide=no_guide)
@@ -147,7 +152,8 @@ def setupHSC(dut, toplevel, template, out, proc_num, debug, minimizing=False, no
     if debug: sail_arg = []
     else: sail_arg = ['-V']
 
-    sail_arg += ['-L', 'ct']
+    sail_arg += ['-L', 'ct'] #TODO make contract an input argument
+    #sail_arg += ['-L', 'arch']
 
     hscHost = rvHSChost(sail, sail_arg, hsc_outfiles, debug=debug)
     rtlHost = rvRTLhost(dut, toplevel, rtl_sigfile, debug=debug)

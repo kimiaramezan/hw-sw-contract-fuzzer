@@ -301,7 +301,7 @@ _fuzz_trap:
         li TESTEND, 1
         sw TESTEND, tohost, t5;
   _test_end:
-        j _test_end;
+        j write_tohost;
 reset_vector:
         RISCV_MULTICORE_DISABLE;
         INIT_SATP;

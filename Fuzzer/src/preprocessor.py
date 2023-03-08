@@ -180,7 +180,7 @@ class rvPreProcessor():
             if version in [ V_U ]:
                 max_cycles = 200000
 
-            hsc_input = hscInput(elf_name_a, elf_name_b, isa_intr_name)
+            hsc_input = hscInput(elf_name_a, elf_name_b, 0) #TODO find a good way of handling this, replacing the constant
             rtl_input = rtlInput(hex_name, rtl_intr_name, data_a, data_b, symbols, max_cycles)
         else:
             hsc_input = None

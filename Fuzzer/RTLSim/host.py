@@ -135,6 +135,9 @@ class rvRTLhost():
 
         self.debug_print('[RTLHost] Start RTL simulation')
 
+        #self.coverage_map = bitarray(repeat(0,2 ** 16))
+        self.coverage_bits = -1
+
         fd = open(rtl_input.hexfile, 'r')
         lines = fd.readlines()
         fd.close()

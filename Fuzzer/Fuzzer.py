@@ -1,6 +1,8 @@
+from itertools import repeat
 import time
 import random
 from bitarray import bitarray
+from bitarray.util import int2ba
 
 from cocotb.decorators import coroutine
 from RTLSim.host import ILL_MEM, SUCCESS, TIME_OUT, ASSERTION_FAIL
@@ -30,7 +32,9 @@ def Run(dut, toplevel,
     mNum = 0
     cNum = 0
     iNum = 0
-    last_coverage = 0
+    htNum = 0
+    cdNum = 0
+    last_coverage = bitarray(repeat(0,1730)) #TODO adapt to toplevel design
 
     debug_print('[DifuzzRTL] Start Fuzzing', debug)
 
@@ -61,18 +65,25 @@ def Run(dut, toplevel,
         (hsc_input, rtl_input, symbols) = preprocessor.process(sim_input, data_a, data_b, assert_intr)
 
         if hsc_input and rtl_input:
-            ret = run_hsc_test(hscHost, hsc_input, stop, out, proc_num)
-            if ret == proc_state.ERR_ISA_TIMEOUT: continue
-            elif ret == proc_state.ERR_ISA_ASSERT: 
-                debug_print('[ISAHost] contract distinguishable', debug, True)
+            ret = hscHost.run_test(hsc_input, stop)
+            if ret == proc_state.ERR_ISA_TIMEOUT: 
+                save_mismatch(out, proc_num, out + '/hsc_timeout',
+                                  sim_input, (data_a, data_b ), htNum)
+                htNum += 1
+                debug_print('[HSCHost] timeout', debug, True)
                 continue
+            elif ret == proc_state.ERR_CONTR_DIST: 
+                save_mismatch(out, proc_num, out + '/contr_dist',
+                                  sim_input, (data_a, data_b ), cdNum)
+                cdNum += 1
+                debug_print('[HSCHost] contract distinguishable', debug, True)
+                continue
+            elif ret == proc_state.ERR_ISA_ASSERT:
+                debug_print('[HSCHost] non-zero exit code', debug, True)
+                break
 
             try:
                 (ret, (cov_bits, cov_map)) = yield rtlHost.run_test(rtl_input, assert_intr)
-                b = bitarray()
-                b.frombytes(cov_bits.to_bytes(length=217, byteorder='big'))
-                coverage = b.count(0)
-                debug_print("cov:{}".format(coverage), debug, False)
             except Exception as e:
                 debug_print('[RTLHost] exception {}'.format(e), debug, True)
                 stop[0] = proc_state.ERR_RTL_SIM
@@ -117,21 +128,26 @@ def Run(dut, toplevel,
 
                 debug_print('[DifuzzRTL] Bug -- {} [{}]'. \
                             format(mNum, cause), debug, not match or (ret != SUCCESS))
-
-            if coverage > last_coverage: #TODO change to 'new bit flipped'
+            
+            cov_bits = int2ba(cov_bits, length=1730, endian='big')
+            cov_bits = ~cov_bits #change to 1 indicating a difference
+            new_coverage = ~last_coverage & cov_bits
+            debug_print("new_cov:{}".format(new_coverage), debug, False)
+            if new_coverage.any():
                 if multicore:
                     cNum = manager.read_num('cNum')
                     manager.write_num('cNum', cNum + 1)
 
                 if record:
-                    save_file(cov_log, 'a', '{:<10}\t{:<10}\t{:<10}\n'.
+                    coverage = new_coverage.count(1)
+                    save_file(cov_log, 'a', '{:<10}\t{:<10}\t{:<10}\t{:<10}\n'.
                               format(time.time() - start_time, start_iter + it,
-                                     start_cov + coverage))
+                                     start_cov + coverage, cov_bits.count(1)))
                     sim_input.save(out + '/corpus/id_{}.si'.format(cNum))
 
                 cNum += 1
                 mutator.add_corpus(sim_input)
-                last_coverage = coverage
+                last_coverage = last_coverage | cov_bits
 
             mutator.update_phase(it)
 

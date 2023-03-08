@@ -83,14 +83,28 @@ if not os.path.isdir(out + '/illegal'):
     os.makedirs(out + '/illegal/asm')
     os.makedirs(out + '/illegal/hex')
 
+if not os.path.isdir(out + '/hsc_timeout'):
+    os.makedirs(out + '/hsc_timeout')
+    os.makedirs(out + '/hsc_timeout/sim_input')
+    os.makedirs(out + '/hsc_timeout/elf')
+    os.makedirs(out + '/hsc_timeout/asm')
+    os.makedirs(out + '/hsc_timeout/hex')
+
+if not os.path.isdir(out + '/contr_dist'):
+    os.makedirs(out + '/contr_dist')
+    os.makedirs(out + '/contr_dist/sim_input')
+    os.makedirs(out + '/contr_dist/elf')
+    os.makedirs(out + '/contr_dist/asm')
+    os.makedirs(out + '/contr_dist/hex')
+
 if not os.path.isdir(out + '/corpus'):
     os.makedirs(out + '/corpus')
 
 date = datetime.today().strftime('%Y%m%d')
 cov_log = out + '/cov_log_{}.txt'.format(date)
 if (multicore or record) and not os.path.isfile(cov_log):
-    save_file(cov_log, 'w', '{:<10}\t{:<10}\t{:<10}\n'.
-              format('time', 'iter', 'coverage'))
+    save_file(cov_log, 'w', '{:<10}\t{:<10}\t{:<10}\t{:<10}\n'.
+              format('time', 'iter', 'new_bits', 'cov_bits'))
 
 start_time = time.time()
 

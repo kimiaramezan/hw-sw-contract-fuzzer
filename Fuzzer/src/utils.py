@@ -68,29 +68,6 @@ def run_isa_test(isaHost, isa_input, stop, out, proc_num, assert_intr=False):
 
     return ret
 
-def run_hsc_test(hscHost, hsc_input, stop, out, proc_num, assert_intr=False):#TODO adapt to sail: execute, perform check on 
-    equal = hscHost.run_test(hsc_input)
-
-    if not equal:
-        return proc_state.ERR_ISA_ASSERT
-
-    return proc_state.NORMAL
-
-    # TODO maybe implement timeout stuff
-    # timer = Timer(ISA_TIME_LIMIT, isa_timeout, [out, stop, proc_num])
-    # timer.start()
-    # isa_ret = isaHost.run_test(isa_input, assert_intr)
-    # timer.cancel()
-
-    # if stop[0] == proc_state.ERR_ISA_TIMEOUT:
-    #     stop[0] = proc_state.NORMAL
-    #     ret = proc_state.ERR_ISA_TIMEOUT
-    # elif isa_ret != 0:
-    #     stop[0] = proc_state.ERR_ISA_ASSERT
-    #     ret = proc_state.ERR_ISA_ASSERT
-
-    # return ret
-
 def debug_print(message, debug, highlight=False):
     if highlight:
         print('\x1b[1;31m' + message + '\x1b[1;m')

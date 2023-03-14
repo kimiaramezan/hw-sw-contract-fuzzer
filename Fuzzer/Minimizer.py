@@ -18,8 +18,8 @@ def Minimize(dut, toplevel,
     assert toplevel in ['RocketTile', 'BoomTile' ], \
         '{} is not toplevel'.format(toplevel)
 
-    (mutator, preprocessor, isaHost, rtlHost, checker) = \
-        setup(dut, toplevel, template, out, proc_num, debug, minimizing=True)
+    (mutator, preprocessor, hscHost, rtlHost, checker) = \
+        setupHSC(dut, toplevel, template, out, proc_num, debug, minimizing=True)
 
     in_dir = out + '/mismatch/sim_input'
     stop = [ proc_state.NORMAL ]
@@ -37,7 +37,7 @@ def Minimize(dut, toplevel,
         print('[DifuzzRTL] Minimizing {}'.format(siName))
 
         minName = min_dir + '/' + siName.split('.si')[0] + '_min.si'
-        (sim_input, data, assert_intr) = mutator.read_siminput(in_dir + '/' + siName)
+        (sim_input, (data_a, data_b), assert_intr) = mutator.read_siminput(in_dir + '/' + siName)
 
         if debug:
             print('[DifuzzRTl] Original Instructions')
@@ -84,20 +84,20 @@ def Minimize(dut, toplevel,
                         if tmp_mask == min_mask:
                             continue
 
-                        (tmp_input, data) = mutator.make_nop(min_input, tmp_mask, part)
+                        (tmp_input, (data_a, data_b)) = mutator.make_nop(min_input, tmp_mask, part)
 
                     else:
-                        (tmp_input, data) = mutator.delete_nop(min_input)
+                        (tmp_input, (data_a, data_b)) = mutator.delete_nop(min_input)
 
                     if debug:
                         print('[DifuzzRTL] Minimized Instructions')
                         for inst in tmp_input.get_insts():
                             print(inst)
 
-                    (isa_input, rtl_input, symbols) = preprocessor.process(tmp_input, data, assert_intr)
+                    (isa_input, rtl_input, symbols) = preprocessor.process(tmp_input, data_a, data_b, assert_intr)
 
                     if isa_input and rtl_input:
-                        ret = run_isa_test(isaHost, isa_input, stop, out, proc_num)
+                        ret = hscHost.run_test(isa_input, stop)
                         if ret == proc_state.ERR_ISA_TIMEOUT: continue
 
                         try:
@@ -109,15 +109,18 @@ def Minimize(dut, toplevel,
                         if assert_intr and ret == SUCCESS:
                             (intr_prv, epc) = checker.check_intr(isa_input, rtl_input, epc)
                             if epc != 0:
-                                ret = run_isa_test(isaHost, isa_input, stop, out, proc_num, True)
+                                ret = hscHost.run_test(isa_input, stop)
                                 if ret == proc_state.ERR_ISA_TIMEOUT: continue
                             else: continue
 
                         match = False
                         if ret == SUCCESS:
-                            match = checker.check(symbols)
+                            match = True
+                            #match = checker.check(symbols)
                         elif ret == ILL_MEM:
                             match = True
+                        elif ret == ASSERTION_FAIL:
+                            match = False
 
                         if not match:
                             min_input = tmp_input
@@ -127,6 +130,6 @@ def Minimize(dut, toplevel,
                         stop[0] = proc_state.ERR_COMPILE
                         break
 
-                min_input.save(minName, data)
+                min_input.save(minName, (data_a, data_b))
 
     debug_print('[DifuzzRTL] Stop Minimizing', debug)

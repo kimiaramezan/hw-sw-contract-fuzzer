@@ -126,7 +126,7 @@ def setupHSC(dut, toplevel, template, out, proc_num, debug, minimizing=False, no
     hsc_outfiles = (out + '/.hsc_out_{}_a.txt'.format(proc_num), out + '/.hsc_out_{}_b.txt'.format(proc_num))
     rtl_sigfile = out + '/.rtl_sig_{}.txt'.format(proc_num)
 
-    if debug: sail_arg = []
+    if debug: sail_arg = ['-V']
     else: sail_arg = ['-V']
 
     sail_arg += ['-L', 'ct'] #TODO make contract an input argument

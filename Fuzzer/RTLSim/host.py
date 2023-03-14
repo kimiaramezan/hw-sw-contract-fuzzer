@@ -93,8 +93,8 @@ class rvRTLhost():
         clkedge = RisingEdge(clock)
 
         #metaReset.value = 1
-        for i in range(timer):
-            yield clkedge
+        #for i in range(timer):
+        #    yield clkedge
         #metaReset.value = 0
         reset.value = 1
         for i in range(timer):
@@ -195,6 +195,8 @@ class rvRTLhost():
 
         yield self.reset(clk, self.dut.reset)
 
+        #assert self.cov_output.value == int('1'*1730,2), 'coverage not reset {}'.format(self.cov_output.value)
+
         self.adapter.start(memory_a, memory_b, ints)
         for i in range(max_cycles):
             yield clkedge
@@ -202,14 +204,19 @@ class rvRTLhost():
             if i % 100 == 0:
                 tohost_a = memory_a[tohost_addr]
                 tohost_b = memory_b[tohost_addr] 
-                if tohost_a and tohost_b:
-                    self.debug_print('[RTLHost] RTL simulation finished correctly')
+                if tohost_a or tohost_b:
                     break
                 else:
                     self.adapter.probe_tohost(tohost_addr)
 
         yield self.adapter.stop()
         clk_driver.kill()
+
+        if tohost_a and tohost_b:
+            self.debug_print('[RTLHost] RTL simulation finished correctly')
+        else:
+            self.debug_print('[RTLHost] RTL simulation finished, violation found')
+            return (ASSERTION_FAIL, self.get_covsum())
 
         # Check all the CPU's memory access operations occurs in DRAM
         mem_check = True

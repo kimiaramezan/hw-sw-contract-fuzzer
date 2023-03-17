@@ -13,7 +13,7 @@ Properties
 """
 class rvInstGenerator():
     def __init__(self, isa='RV64G'):
-        isas = ['trap_ret']
+        isas = [] #['trap_ret']
 
         if 'I' in isa:
             isas += [ 'rv32i' ]

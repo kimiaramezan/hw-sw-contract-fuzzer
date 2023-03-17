@@ -46,8 +46,8 @@ rv32i_itype = {
     'ori'   : ('ori xreg0, xreg1, imm12'  , ('xreg0', 'xreg1',), (), (('imm12', 1),), ()),
     'andi'  : ('andi xreg0, xreg1, imm12' , ('xreg0', 'xreg1',), (), (('imm12', 1),), ()),
     'fence' : ('fence'                    , ()                , (), ()       , ()),
-    'ecall' : ('ecall'                    , ()                , (), ()       , ()),
-    'ebreak': ('ebreak'                   , ()                , (), ()       , ())
+#    'ecall' : ('ecall'                    , ()                , (), ()       , ()),
+#    'ebreak': ('ebreak'                   , ()                , (), ()       , ())
 }
 
 rv32i_stype = {

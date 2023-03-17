@@ -126,26 +126,24 @@ class tileAdapter(): #adapt to new instrumented dut structure with two tiles
         return self.monitor_valid_a.value & self.monitor_valid_b.value
 
     @coroutine
-    def interrupt_handler(self, ints): #TODO adapt interrupt to both copies
-        if not ints:
-            return
+    def interrupt_handler(self, ints): #interrupts currently ignored TODO adapt interrupt to both copies
+        yield RisingEdge(self.dut.clock)
+        # if not ints:
+        #     return
 
-        while self.drive:
-            if self.pc_valid():
-                pc = self.monitor_pc.value & ((1 << len(self.monitor_pc.value)) - 1)
-                if pc in ints.keys():
-                    self.debug_print('[RTLHost] interrupt_handler, pc: {:016x}, INT: {:01x}'.
-                                     format(pc, ints[pc]))
-                    self.assert_intr(ints[pc])
-            yield RisingEdge(self.dut.clock)
+        # while self.drive:
+        #     if self.pc_valid():
+        #         pc = self.monitor_pc.value & ((1 << len(self.monitor_pc.value)) - 1)
+        #         if pc in ints.keys():
+        #             self.debug_print('[RTLHost] interrupt_handler, pc: {:016x}, INT: {:01x}'.
+        #                              format(pc, ints[pc]))
+        #             self.assert_intr(ints[pc])
+        #     yield RisingEdge(self.dut.clock)
 
 
     def probe_tohost(self, tohost_addr):  #TODO check what this does and adapt
         self.tl_adapter_a.probe_block(tohost_addr)
         self.tl_adapter_b.probe_block(tohost_addr)
-
-    def check_assert(self):  #TODO check what this does and adapt
-        return self.dut.metaAssert.value
 
     def start(self, memory_a, memory_b, ints): #two memory sections, containing both instructions and data
         if memory_a.__class__.__name__ != 'dict' or memory_b.__class__.__name__ != 'dict':

@@ -104,7 +104,7 @@ class rvMutator():
         self.phases = [GENERATION, MUTATION, MERGE]
         self.phase = GENERATION
 
-        self.num_prefix = 3
+        self.num_prefix = 0 #3
         self.num_words = 100
         self.num_suffix = 5
 
@@ -115,7 +115,7 @@ class rvMutator():
         self.random_data = {}
         self.data_seeds = []
 
-        self.inst_generator = rvInstGenerator('RV64G')
+        self.inst_generator = rvInstGenerator('RV64IM')
 
     def add_data(self, new_data=([],[])): #TODO add data mutation
         if len(self.data_seeds) == self.max_data:
@@ -441,7 +441,7 @@ class rvMutator():
             self.update_data_seeds(data_seed)
 
         if template == -1:
-            template = random.randint(0, V_U)
+            template = random.randint(0, P_U) #V_U)
 
         sim_input = simInput(prefix, words, suffix, ints, data_seed, template)
         data = self.random_data[data_seed]

@@ -7,10 +7,10 @@ import psutil
 import signal
 from src.multicore_manager import proc_state
 
-HSC_TIME_LIMIT = 1
+HSC_TIME_LIMIT = 1 #time in seconds
 
 class hscInput():
-    def __init__(self, binary_a, binary_b, max_cycles): #GG now with two binaries
+    def __init__(self, binary_a, binary_b, max_cycles=0): #GG now with two binaries
         self.binary_a = binary_a
         self.binary_b = binary_b
         self.max_cycles = max_cycles
@@ -33,7 +33,7 @@ class rvHSChost():  #TODO adapt to sail simulator
             try: os.kill(child.pid, signal.SIGKILL) # SIGKILL
             except: continue
 
-        stop[0] = proc_state.ERR_ISA_TIMEOUT
+        stop[0] = proc_state.ERR_HSC_TIMEOUT
 
     def run_test(self, hsc_input: hscInput, stop):
         sail_args = [ self.sail ] + self.sail_args 
@@ -47,11 +47,11 @@ class rvHSChost():  #TODO adapt to sail simulator
         a_ret = subprocess.call(args_a) #TODO parallelize with other call for b
         timer.cancel()
         
-        if stop[0] == proc_state.ERR_ISA_TIMEOUT:
+        if stop[0] == proc_state.ERR_HSC_TIMEOUT:
             stop[0] = proc_state.NORMAL
-            return proc_state.ERR_ISA_TIMEOUT
+            return proc_state.ERR_HSC_TIMEOUT
         elif a_ret != 0:
-            return proc_state.ERR_ISA_ASSERT
+            return proc_state.ERR_HSC_ASSERT
 
         args_b = sail_args + [ hsc_input.binary_b, '-o', self.out_b]
         timer = Timer(HSC_TIME_LIMIT, self.timeout, [stop])
@@ -59,11 +59,11 @@ class rvHSChost():  #TODO adapt to sail simulator
         b_ret = subprocess.call(args_b)
         timer.cancel()
 
-        if stop[0] == proc_state.ERR_ISA_TIMEOUT:
+        if stop[0] == proc_state.ERR_HSC_TIMEOUT:
             stop[0] = proc_state.NORMAL
-            return proc_state.ERR_ISA_TIMEOUT
+            return proc_state.ERR_HSC_TIMEOUT
         elif b_ret != 0:
-            return proc_state.ERR_ISA_ASSERT
+            return proc_state.ERR_HSC_ASSERT
 
         if filecmp.cmp(self.out_a, self.out_b, shallow=False):
             return proc_state.NORMAL

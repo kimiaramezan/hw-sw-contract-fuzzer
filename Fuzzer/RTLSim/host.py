@@ -9,10 +9,10 @@ from itertools import repeat
 from reader.tile_reader import tileSrcReader
 from adapters.tile_adapter import tileAdapter
 
-SUCCESS = 0
-ASSERTION_FAIL = 1
-TIME_OUT = 2
-ILL_MEM = -1
+NO_LEAK = 0
+LEAK = 1
+TIME_OUT = 2 #TODO do we need this? Theoretically programs should terminate if sail behaviour == rtl behaviour, could block 'longer' programs from being tested
+#ILL_MEM = -1
 
 DRAM_BASE = 0x80000000
 
@@ -204,42 +204,47 @@ class rvRTLhost():
             if i % 100 == 0:
                 tohost_a = memory_a[tohost_addr]
                 tohost_b = memory_b[tohost_addr] 
-                if tohost_a or tohost_b:
+                if tohost_a or tohost_b: # one core terminated TODO either wait for other to finish, maybe get and ouput pc from other one
                     break
                 else:
                     self.adapter.probe_tohost(tohost_addr)
 
         yield self.adapter.stop()
         clk_driver.kill()
-
-        if tohost_a and tohost_b:
-            self.debug_print('[RTLHost] RTL simulation finished correctly')
-        else:
-            self.debug_print('[RTLHost] RTL simulation finished, violation found')
-            return (ASSERTION_FAIL, self.get_covsum())
-
-        # Check all the CPU's memory access operations occurs in DRAM
-        mem_check = True
-        for addr in memory_a.keys():
-            if addr not in bootrom_addrs and addr < DRAM_BASE:
-                mem_check = False
-        for addr in memory_b.keys():
-            if addr not in bootrom_addrs and addr < DRAM_BASE:
-                mem_check = False
+        self.debug_print('[RTLHost] End of RTL simulation')
 
 
-        if not mem_check:
-            return (ILL_MEM, self.get_covsum())
+        if (tohost_a and not tohost_b) or (not tohost_a and tohost_b): #one finished earlier
+            self.debug_print('[RTLHost] Observed timing leak')
+            return_val = LEAK
 
-        if i == max_cycles - 1:
+        elif tohost_a and tohost_b: #both finished in the same 100 cycle batch
+            self.debug_print('[RTLHost] Observations equal')
+            return_val = NO_LEAK
+        
+        else: # none finished in time timed out (this should only happen if a program take unforseen many cycles per instruction)
             self.debug_print('[RTLHost] Timeout, max_cycle={}'.format(max_cycles))
-            return (TIME_OUT, self.get_covsum())
+            return_val = TIME_OUT
+
+        
+        return (return_val, self.get_covsum())
+        
+        # GG TODO maybe make new checks for memory as in "same parts were accessed", however, this depends on observable stuff
+        # Check all the CPU's memory access operations occurs in DRAM
+        # mem_check = True
+        # for addr in memory_a.keys():
+        #     if addr not in bootrom_addrs and addr < DRAM_BASE:
+        #         mem_check = False
+        # for addr in memory_b.keys():
+        #     if addr not in bootrom_addrs and addr < DRAM_BASE:
+        #         mem_check = False
+
+        # if not mem_check:
+        #     return (ILL_MEM, self.get_covsum())
+
 
         #if self.adapter.check_assert():
         #    self.debug_print('[RTLHost] Assertion Failure')
         #    return (ASSERTION_FAIL, self.get_covsum())
 
-        self.save_signature(memory, sig_start, sig_end, data_addrs, self.rtl_sig_file)
-        self.debug_print('[RTLHost] Stop RTL simulation')
-
-        return (SUCCESS, self.get_covsum())
+        #self.save_signature(memory, sig_start, sig_end, data_addrs, self.rtl_sig_file)

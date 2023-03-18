@@ -4,7 +4,7 @@ from threading import Timer
 from copy import deepcopy
 
 from cocotb.decorators import coroutine
-from RTLSim.host import ILL_MEM, SUCCESS, TIME_OUT, ASSERTION_FAIL
+from RTLSim.host import NO_LEAK, TIME_OUT, LEAK
 from src.word import PREFIX, MAIN, SUFFIX
 
 from src.utils import *
@@ -21,10 +21,10 @@ def Minimize(dut, toplevel,
     (mutator, preprocessor, hscHost, rtlHost, checker) = \
         setupHSC(dut, toplevel, template, out, proc_num, debug, minimizing=True)
 
-    in_dir = out + '/mismatch/sim_input'
+    in_dir = out + '/leaks/sim_input'
     stop = [ proc_state.NORMAL ]
 
-    min_dir = out + '/mismatch/min_input'
+    min_dir = out + '/leaks/min_input'
     if not os.path.isdir(min_dir):
         os.makedirs(min_dir)
 
@@ -98,7 +98,11 @@ def Minimize(dut, toplevel,
 
                     if isa_input and rtl_input:
                         ret = hscHost.run_test(isa_input, stop)
-                        if ret == proc_state.ERR_ISA_TIMEOUT: continue
+                        if ret == proc_state.ERR_HSC_TIMEOUT: continue # this should not happen as execution time with no-ops should be lower
+                        if ret == proc_state.ERR_CONTR_DIST: continue # this should not happen as replacing a command with no-ops should lead to less leakage
+                        if ret == proc_state.ERR_HSC_ASSERT: # this should not happen as replacing a command with no-ops should not lead to faults
+                            print('[Minimizer] {} minimize leads to Sail non-zero exit'.format(siName))
+                            break
 
                         try:
                             (ret, coverage) = yield rtlHost.run_test(rtl_input, assert_intr)
@@ -106,23 +110,15 @@ def Minimize(dut, toplevel,
                             stop[0] = proc_state.ERR_RTL_SIM
                             break
 
-                        if assert_intr and ret == SUCCESS:
-                            (intr_prv, epc) = checker.check_intr(isa_input, rtl_input, epc)
-                            if epc != 0:
-                                ret = hscHost.run_test(isa_input, stop)
-                                if ret == proc_state.ERR_ISA_TIMEOUT: continue
-                            else: continue
+                        # GG not handling interrupt at the moment
+                        # if assert_intr and ret == NO_LEAK:
+                        #     (intr_prv, epc) = checker.check_intr(isa_input, rtl_input, epc)
+                        #     if epc != 0:
+                        #         ret = hscHost.run_test(isa_input, stop)
+                        #         if ret == proc_state.ERR_ISA_TIMEOUT: continue
+                        #     else: continue
 
-                        match = False
-                        if ret == SUCCESS:
-                            match = True
-                            #match = checker.check(symbols)
-                        elif ret == ILL_MEM:
-                            match = True
-                        elif ret == ASSERTION_FAIL:
-                            match = False
-
-                        if not match:
+                        if ret == LEAK:
                             min_input = tmp_input
                             min_mask = tmp_mask
 

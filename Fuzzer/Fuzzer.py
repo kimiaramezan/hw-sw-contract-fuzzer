@@ -5,7 +5,7 @@ from bitarray import bitarray
 from bitarray.util import int2ba
 
 from cocotb.decorators import coroutine
-from RTLSim.host import ILL_MEM, SUCCESS, TIME_OUT, ASSERTION_FAIL
+from RTLSim.host import NO_LEAK, TIME_OUT, LEAK
 
 from src.utils import *
 from src.multicore_manager import proc_state
@@ -29,9 +29,9 @@ def Run(dut, toplevel,
     if in_file: num_iter = 1
 
     stop = [ proc_state.NORMAL ]
-    mNum = 0
+    lNum = 0
     cNum = 0
-    iNum = 0
+    rtNum = 0
     htNum = 0
     cdNum = 0
     last_coverage = bitarray(repeat(0,1730)) #TODO adapt to toplevel design
@@ -54,8 +54,8 @@ def Run(dut, toplevel,
         if random.random() < prob_intr:
             assert_intr = True
 
-        if in_file: (sim_input, (data_a, data_b ), assert_intr) = mutator.read_siminput(in_file) #TODO read/write two data sections
-        else: (sim_input, (data_a, data_b )) = mutator.get(assert_intr)
+        if in_file: (sim_input, (data_a, data_b), assert_intr) = mutator.read_siminput(in_file) #TODO read/write two data sections
+        else: (sim_input, (data_a, data_b)) = mutator.get(assert_intr)
 
         if debug:
             print('[DifuzzRTL] Fuzz Instructions')
@@ -66,19 +66,19 @@ def Run(dut, toplevel,
 
         if hsc_input and rtl_input:
             ret = hscHost.run_test(hsc_input, stop)
-            if ret == proc_state.ERR_ISA_TIMEOUT: 
+            if ret == proc_state.ERR_HSC_TIMEOUT: 
                 save_mismatch(out, proc_num, out + '/hsc_timeout',
-                                  sim_input, (data_a, data_b ), htNum)
+                                  sim_input, (data_a, data_b), htNum)
                 htNum += 1
                 debug_print('[HSCHost] timeout', debug, True)
                 continue
             elif ret == proc_state.ERR_CONTR_DIST: 
                 save_mismatch(out, proc_num, out + '/contr_dist',
-                                  sim_input, (data_a, data_b ), cdNum)
+                                  sim_input, (data_a, data_b), cdNum)
                 cdNum += 1
                 debug_print('[HSCHost] contract distinguishable', debug, True)
                 continue
-            elif ret == proc_state.ERR_ISA_ASSERT:
+            elif ret == proc_state.ERR_HSC_ASSERT: # exit, temporary files stay available to debug sail
                 debug_print('[HSCHost] non-zero exit code', debug, True)
                 break
 
@@ -88,51 +88,64 @@ def Run(dut, toplevel,
                 debug_print('[RTLHost] exception {}'.format(e), debug, True)
                 stop[0] = proc_state.ERR_RTL_SIM
                 break
+            
+            #TODO maybe adapt to interrupts
+            # if assert_intr and ret == NO_LEAK:
+            #     (intr_prv, epc) = checker.check_intr(symbols)
+            #     if epc != 0:
+            #         preprocessor.write_isa_intr(hsc_input, rtl_input, epc)
+            #         ret = run_isa_test(hscHost, hsc_input, stop, out, proc_num, True)
+            #         if ret == proc_state.ERR_HSC_TIMEOUT: continue
+            #         elif ret == proc_state.ERR_HSC_ASSERT: break
+            #     else: continue
 
-            if assert_intr and ret == SUCCESS:
-                (intr_prv, epc) = checker.check_intr(symbols)
-                if epc != 0:
-                    preprocessor.write_isa_intr(hsc_input, rtl_input, epc)
-                    ret = run_isa_test(hscHost, hsc_input, stop, out, proc_num, True)
-                    if ret == proc_state.ERR_ISA_TIMEOUT: continue
-                    elif ret == proc_state.ERR_ISA_ASSERT: break
-                else: continue
+            # cause = '-'
+            # match = False
+            # if ret == NO_LEAK: #TODO compare sail vs rtl
+            #    #match = checker.check(symbols)
+            #    match = True
+            # GG maybe add again if memory checks are interesting
+            # elif ret == ILL_MEM: 
+            #     match = True
+            #     debug_print('[DifuzzRTL] Memory access outside DRAM -- {}'. \
+            #                 format(iNum), debug, True)
+            #     if record:
+            #         save_mismatch(out, proc_num, out + '/illegal',
+            #                       sim_input, (data_a, data_b), iNum)
+            #     iNum += 1
 
-            cause = '-'
-            match = False
-            if ret == SUCCESS: #TODO compare sail vs rtl
-                #match = checker.check(symbols)
-                match = True
-            elif ret == ILL_MEM:
-                match = True
-                debug_print('[DifuzzRTL] Memory access outside DRAM -- {}'. \
-                            format(iNum), debug, True)
-                if record:
-                    save_mismatch(out, proc_num, out + '/illegal',
-                                  sim_input, (data_a, data_b ), iNum)
-                iNum += 1
-
-            if not match or ret not in [SUCCESS, ILL_MEM]:
+            if ret == LEAK: #not match or ret not in [NO_LEAK, ILL_MEM]:
                 if multicore:
-                    mNum = manager.read_num('mNum')
-                    manager.write_num('mNum', mNum + 1)
+                    lNum = manager.read_num('lNum')
+                    manager.write_num('lNum', lNum + 1)
 
                 if record:
-                    save_mismatch(out, proc_num, out + '/mismatch',
-                                  sim_input, (data_a, data_b ), mNum)
+                    save_mismatch(out, proc_num, out + '/leaks',
+                                  sim_input, (data_a, data_b), lNum)
 
-                mNum += 1
-                if ret == TIME_OUT: cause = 'Timeout'
-                elif ret == ASSERTION_FAIL: cause = 'Assertion fail'
-                else: cause = 'Mismatch'
+                lNum += 1
 
-                debug_print('[DifuzzRTL] Bug -- {} [{}]'. \
-                            format(mNum, cause), debug, not match or (ret != SUCCESS))
+                debug_print('[DifuzzRTL] Bug -- {} [Leakage]'. \
+                            format(lNum), debug, True)
+                
+            elif ret == TIME_OUT:
+                if multicore:
+                    rtNum = manager.read_num('rtNum')
+                    manager.write_num('rtNum', rtNum + 1)
+
+                if record:
+                    save_mismatch(out, proc_num, out + '/rtl_timeout',
+                                  sim_input, (data_a, data_b), rtNum)
+
+                rtNum += 1
+                debug_print('[DifuzzRTL] Bug -- {} [RTL Timeout]'. \
+                            format(rtNum), debug, True)
             
             cov_bits = int2ba(cov_bits, length=1730, endian='big')
             cov_bits = ~cov_bits #change to 1 indicating a difference
             new_coverage = ~last_coverage & cov_bits
             debug_print("new_cov:{}".format(new_coverage), debug, False)
+            debug_print("new_cov#:{}".format(new_coverage.count(1)), debug, False)
             if new_coverage.any():
                 if multicore:
                     cNum = manager.read_num('cNum')

@@ -115,7 +115,7 @@ class rvMutator():
         self.random_data = {}
         self.data_seeds = []
 
-        self.inst_generator = rvInstGenerator('RV64IM')
+        self.inst_generator = rvInstGenerator('RV64IM') #TODO make anrgument
 
     def add_data(self, new_data=([],[])): #TODO add data mutation
         if len(self.data_seeds) == self.max_data:

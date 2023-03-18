@@ -204,7 +204,11 @@ class rvRTLhost():
             if i % 100 == 0:
                 tohost_a = memory_a[tohost_addr]
                 tohost_b = memory_b[tohost_addr] 
-                if tohost_a or tohost_b: # one core terminated TODO either wait for other to finish, maybe get and ouput pc from other one
+                if tohost_a: # or tohost_b: # one core terminated TODO either wait for other to finish, maybe get and ouput pc from other one
+                    self.debug_print('a done')
+                    break
+                elif tohost_b:
+                    self.debug_print('b done')
                     break
                 else:
                     self.adapter.probe_tohost(tohost_addr)

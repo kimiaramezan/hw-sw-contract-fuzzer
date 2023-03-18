@@ -63,8 +63,8 @@ def run_isa_test(isaHost, isa_input, stop, out, proc_num, assert_intr=False):
         stop[0] = proc_state.NORMAL
         ret = proc_state.ERR_ISA_TIMEOUT
     elif isa_ret != 0:
-        stop[0] = proc_state.ERR_ISA_ASSERT
-        ret = proc_state.ERR_ISA_ASSERT
+        stop[0] = proc_state.ERR_HSC_ASSERT
+        ret = proc_state.ERR_HSC_ASSERT
 
     return ret
 

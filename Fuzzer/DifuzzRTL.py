@@ -69,12 +69,12 @@ debug = parser.arg_map['debug'][0]
 if not os.path.isdir(out):
     os.makedirs(out)
 
-if not os.path.isdir(out + '/mismatch'):
-    os.makedirs(out + '/mismatch')
-    os.makedirs(out + '/mismatch/sim_input')
-    os.makedirs(out + '/mismatch/elf')
-    os.makedirs(out + '/mismatch/asm')
-    os.makedirs(out + '/mismatch/hex')
+if not os.path.isdir(out + '/leaks'):
+    os.makedirs(out + '/leaks')
+    os.makedirs(out + '/leaks/sim_input')
+    os.makedirs(out + '/leaks/elf')
+    os.makedirs(out + '/leaks/asm')
+    os.makedirs(out + '/leaks/hex')
 
 if not os.path.isdir(out + '/illegal'):
     os.makedirs(out + '/illegal')
@@ -89,6 +89,13 @@ if not os.path.isdir(out + '/hsc_timeout'):
     os.makedirs(out + '/hsc_timeout/elf')
     os.makedirs(out + '/hsc_timeout/asm')
     os.makedirs(out + '/hsc_timeout/hex')
+
+if not os.path.isdir(out + '/rtl_timeout'):
+    os.makedirs(out + '/rtl_timeout')
+    os.makedirs(out + '/rtl_timeout/sim_input')
+    os.makedirs(out + '/rtl_timeout/elf')
+    os.makedirs(out + '/rtl_timeout/asm')
+    os.makedirs(out + '/rtl_timeout/hex')
 
 if not os.path.isdir(out + '/contr_dist'):
     os.makedirs(out + '/contr_dist')

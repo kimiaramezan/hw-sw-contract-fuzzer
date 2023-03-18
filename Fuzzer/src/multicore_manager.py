@@ -9,8 +9,8 @@ from cocotb.triggers import RisingEdge, Timer
 
 NORMAL          = 0
 ERR_COMPILE     = 1
-ERR_ISA_ASSERT  = 2
-ERR_ISA_TIMEOUT = 3
+ERR_HSC_ASSERT  = 2
+ERR_HSC_TIMEOUT = 3
 ERR_RTL_SIM     = 4
 ERR_SI_READ     = 5
 ERR_CONTR_DIST  = 6
@@ -19,8 +19,8 @@ class procState():
     def __init__(self):
         self.NORMAL = NORMAL
         self.ERR_COMPILE = ERR_COMPILE
-        self.ERR_ISA_TIMEOUT = ERR_ISA_TIMEOUT
-        self.ERR_ISA_ASSERT = ERR_ISA_ASSERT
+        self.ERR_HSC_TIMEOUT = ERR_HSC_TIMEOUT
+        self.ERR_HSC_ASSERT = ERR_HSC_ASSERT
         self.ERR_RTL_SIM = ERR_RTL_SIM
         self.ERR_SI_READ = ERR_SI_READ
         self.ERR_CONTR_DIST = ERR_CONTR_DIST
@@ -28,8 +28,8 @@ class procState():
         self.tpe = {
             NORMAL: 'NORMAL',
             ERR_COMPILE: 'ERR_COMPILE',
-            ERR_ISA_TIMEOUT: 'ERR_ISA_TIMEOUT',
-            ERR_ISA_ASSERT: 'ERR_ISA_ASSERT',
+            ERR_HSC_TIMEOUT: 'ERR_HSC_TIMEOUT',
+            ERR_HSC_ASSERT: 'ERR_HSC_ASSERT',
             ERR_RTL_SIM: 'ERR_RTL_SIM',
             ERR_SI_READ: 'ERR_SI_READ',
             ERR_CONTR_DIST: 'ERR_CONTR_DIST'

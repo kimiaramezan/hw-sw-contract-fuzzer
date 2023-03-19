@@ -99,7 +99,7 @@ class rvPreProcessor():
             if cc_ret != -9: break
         return cc_ret
 
-    def process(self, sim_input: simInput, data_a: list, data_b: list, intr: bool, num_data_sections=6): #TODO check this section, especially for data
+    def process(self, sim_input: simInput, data_a: list, data_b: list, intr: bool, num_data_sections=6): # data in elf and hex files, but adapter uses python data lists
         section_size = len(data_a) // num_data_sections
 
         assert len(data_a) == len(data_b), 'data sections have to be of equal length'

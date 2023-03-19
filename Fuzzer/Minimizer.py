@@ -13,13 +13,13 @@ from src.multicore_manager import proc_state
 @coroutine
 def Minimize(dut, toplevel,
              template='Template', out='output', num_cores=1, proc_num=0,
-             debug=False, contract='ct'):
+             debug=False, contract='ct', isa='RV64I'):
 
     assert toplevel in ['RocketTile', 'BoomTile' ], \
         '{} is not toplevel'.format(toplevel)
 
     (mutator, preprocessor, hscHost, rtlHost, checker) = \
-        setupHSC(dut, toplevel, template, out, proc_num, debug, contract, minimizing=True)
+        setupHSC(dut, toplevel, template, out, proc_num, debug, contract, isa, minimizing=True)
 
     in_dir = out + '/leaks/sim_input'
     stop = [ proc_state.NORMAL ]

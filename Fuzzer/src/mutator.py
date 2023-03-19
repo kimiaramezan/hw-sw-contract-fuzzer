@@ -97,7 +97,7 @@ class simInput():
 
 
 class rvMutator():
-    def __init__(self, max_data_seeds=100, corpus_size=1000, no_guide=False):
+    def __init__(self, isa='RV64I', max_data_seeds=100, corpus_size=1000, no_guide=False):
         self.corpus_size = corpus_size
         self.corpus = []
 
@@ -115,7 +115,7 @@ class rvMutator():
         self.random_data = {}
         self.data_seeds = []
 
-        self.inst_generator = rvInstGenerator('RV64IM') #TODO make anrgument
+        self.inst_generator = rvInstGenerator(isa)
 
     def add_data(self, new_data=([],[])): #TODO add data mutation
         if len(self.data_seeds) == self.max_data:

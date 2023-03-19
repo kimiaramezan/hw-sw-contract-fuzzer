@@ -15,7 +15,7 @@ class hscInput():
         self.binary_b = binary_b
         self.max_cycles = max_cycles
 
-class rvHSChost():  #TODO adapt to sail simulator
+class rvHSChost():
     def __init__(self, sail, sail_args, hsc_outfiles ,debug=False):
         self.sail = sail
         self.sail_args = sail_args

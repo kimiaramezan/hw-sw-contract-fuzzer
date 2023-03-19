@@ -125,7 +125,7 @@ class rvRTLhost():
 
         fd.close()
 
-    def get_covsum(self): #TODO adapt to new coverage metric, change to collect coverage every clockstep
+    def get_covsum(self):
         #cov_mask = (1 << len(self.cov_output)) - 1
         #print("ATTENTION {}".format(self.cov_output.value))
         return (self.coverage_bits, self.coverage_map)

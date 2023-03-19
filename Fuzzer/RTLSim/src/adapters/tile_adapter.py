@@ -141,7 +141,7 @@ class tileAdapter(): #adapt to new instrumented dut structure with two tiles
         #     yield RisingEdge(self.dut.clock)
 
 
-    def probe_tohost(self, tohost_addr):  #TODO check what this does and adapt
+    def probe_tohost(self, tohost_addr):
         self.tl_adapter_a.probe_block(tohost_addr)
         self.tl_adapter_b.probe_block(tohost_addr)
 

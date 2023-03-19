@@ -129,8 +129,7 @@ def setupHSC(dut, toplevel, template, out, proc_num, debug, contract='ct', minim
     if debug: sail_arg = ['-V']
     else: sail_arg = ['-V']
 
-    sail_arg += ['-L', contract] #TODO make contract an input argument
-    #sail_arg += ['-L', 'arch']
+    sail_arg += ['-L', contract] # use contract from input argument
 
     hscHost = rvHSChost(sail, sail_arg, hsc_outfiles, debug=debug)
     rtlHost = rvRTLhost(dut, toplevel, rtl_sigfile, debug=debug)

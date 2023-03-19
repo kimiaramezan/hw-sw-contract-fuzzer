@@ -50,6 +50,7 @@ parser.add_option('multicore', 0, 'The number of cores to use')
 parser.add_option('debug', 0, 'Debugging?')
 parser.add_option('minimize', 0, 'Minimizing?')
 parser.add_option('prob_intr', 0, 'Probability of asserting interrupt')
+parser.add_option('contract', 'ct', 'HW-SW contract to check')
 parser.add_option('no_guide', 0, 'Only random testing?')
 
 parser.print_help()
@@ -64,7 +65,7 @@ parser.arg_map.pop('minimize', None)
 toplevel = parser.arg_map['toplevel'][0]
 template = parser.arg_map['template'][0]
 debug = parser.arg_map['debug'][0]
-
+contract = parser.arg_map['contract'][0]
 
 if not os.path.isdir(out):
     os.makedirs(out)
@@ -122,6 +123,7 @@ if not multicore:
         factory.add_option('template', [template])
         factory.add_option('out', [out])
         factory.add_option('debug', [debug])
+        factory.add_option('contract', [contract])
 
     else:
         factory = TestFactory(Run)
@@ -227,4 +229,5 @@ else:
             factory.add_option('num_cores', [multicore])
             factory.add_option('proc_num', [i])
             factory.add_option('debug', [debug])
+            factory.add_option('contract', [contract])
             factory.generate_tests()

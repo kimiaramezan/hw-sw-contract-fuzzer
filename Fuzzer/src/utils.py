@@ -115,7 +115,7 @@ def setup(dut, toplevel, template, out, proc_num, debug, minimizing=False, no_gu
 
     return (mutator, preprocessor, isaHost, rtlHost, checker)
 
-def setupHSC(dut, toplevel, template, out, proc_num, debug, minimizing=False, no_guide=False): #TODO adapt to sail
+def setupHSC(dut, toplevel, template, out, proc_num, debug, contract='ct', minimizing=False, no_guide=False): #TODO adapt to sail
     mutator = rvMutator(no_guide=no_guide)
 
     cc = 'riscv64-unknown-elf-gcc'
@@ -129,7 +129,7 @@ def setupHSC(dut, toplevel, template, out, proc_num, debug, minimizing=False, no
     if debug: sail_arg = ['-V']
     else: sail_arg = ['-V']
 
-    sail_arg += ['-L', 'ct'] #TODO make contract an input argument
+    sail_arg += ['-L', contract] #TODO make contract an input argument
     #sail_arg += ['-L', 'arch']
 
     hscHost = rvHSChost(sail, sail_arg, hsc_outfiles, debug=debug)

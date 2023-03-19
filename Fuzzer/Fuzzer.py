@@ -16,7 +16,7 @@ def Run(dut, toplevel,
         num_iter=1, template='Template', in_file=None,
         out='output', record=False, cov_log=None,
         multicore=0, manager=None, proc_num=0, start_time=0, start_iter=0, start_cov=0,
-        prob_intr=0, no_guide=False, debug=False):
+        prob_intr=0, no_guide=False, debug=False, contract='ct'):
 
     assert toplevel in ['RocketTile', 'BoomTile' ], \
         '{} is not toplevel'.format(toplevel)
@@ -24,7 +24,7 @@ def Run(dut, toplevel,
     random.seed(time.time() * (proc_num + 1))
 
     (mutator, preprocessor, hscHost, rtlHost, checker) = \
-        setupHSC(dut, toplevel, template, out, proc_num, debug, no_guide=no_guide)
+        setupHSC(dut, toplevel, template, out, proc_num, debug, contract, no_guide=no_guide)
 
     if in_file: num_iter = 1
 

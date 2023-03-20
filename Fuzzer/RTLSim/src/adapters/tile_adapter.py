@@ -122,8 +122,9 @@ class tileAdapter(): #adapt to new instrumented dut structure with two tiles
         self.int_ports.b_msip.value = msip
         self.int_ports.b_mtip.value = mtip
 
-    def pc_valid(self):
-        return self.monitor_valid_a.value & self.monitor_valid_b.value
+    # not used see below
+    # def pc_valid(self):
+    #    return self.monitor_valid_a.value & self.monitor_valid_b.value
 
     @coroutine
     def interrupt_handler(self, ints): #interrupts currently ignored TODO adapt interrupt to both copies
@@ -157,11 +158,11 @@ class tileAdapter(): #adapt to new instrumented dut structure with two tiles
     @coroutine
     def stop(self):
         self.drive = False
-        while self.tl_adapter_a.onGoing() & self.tl_adapter_b.onGoing():
+        while self.tl_adapter_a.onGoing() or self.tl_adapter_b.onGoing():
             yield RisingEdge(self.dut.clock)
         self.tl_adapter_a.stop()
         self.tl_adapter_b.stop()
-        while self.tl_adapter_a.isRunning() & self.tl_adapter_b.isRunning():
+        while self.tl_adapter_a.isRunning() or self.tl_adapter_b.isRunning():
             yield RisingEdge(self.dut.clock)
 
         self.int_ports.a_seip.value = 0

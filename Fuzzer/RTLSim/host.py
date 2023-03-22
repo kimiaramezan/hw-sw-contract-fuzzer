@@ -89,13 +89,13 @@ class rvRTLhost():
             yield Timer(period / 2)
 
     @coroutine
-    def reset(self, clock, reset, timer=5):
+    def reset(self, clock, metaReset, reset, timer=5):
         clkedge = RisingEdge(clock)
 
-        #metaReset.value = 1
-        #for i in range(timer):
-        #    yield clkedge
-        #metaReset.value = 0
+        metaReset.value = 1
+        for i in range(timer):
+            yield clkedge
+        metaReset.value = 0
         reset.value = 1
         for i in range(timer):
             yield clkedge
@@ -193,9 +193,9 @@ class rvRTLhost():
         clk_driver = cocotb.fork(self.clock_gen(clk))
         clkedge = RisingEdge(clk)
 
-        yield self.reset(clk, self.dut.reset)
+        yield self.reset(clk, self.dut.metaReset, self.dut.reset)
 
-        #assert self.cov_output.value == int('1'*1730,2), 'coverage not reset {}'.format(self.cov_output.value)
+        assert self.cov_output.value == int('1'*1730,2), 'coverage not reset {}'.format(self.cov_output.value)
 
         self.adapter.start(memory_a, memory_b, ints)
         for i in range(max_cycles):

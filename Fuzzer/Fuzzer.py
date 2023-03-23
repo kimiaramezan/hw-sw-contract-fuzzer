@@ -16,7 +16,7 @@ def Run(dut, toplevel,
         num_iter=1, template='Template', in_file=None,
         out='output', record=False, cov_log=None,
         multicore=0, manager=None, proc_num=0, start_time=0, start_iter=0, start_cov=0,
-        prob_intr=0, no_guide=False, debug=False, contract='ct', isa='RV64I'):
+        prob_intr=0, no_guide=False, debug=False, contract='ct', isa='RV64I', trace_log=None):
 
     assert toplevel in ['RocketTile', 'BoomTile' ], \
         '{} is not toplevel'.format(toplevel)
@@ -144,15 +144,21 @@ def Run(dut, toplevel,
             cov_bits = int2ba(cov_bits, length=1730, endian='big')
             cov_bits = ~cov_bits #change to 1 indicating a difference
             new_coverage = ~last_coverage & cov_bits
+            coverage = new_coverage.count(1)
+            
             debug_print("new_cov:{}".format(new_coverage), debug, False)
             debug_print("new_cov#:{}".format(new_coverage.count(1)), debug, False)
+                        
+            sim_input.save(out + '/trace/id_{}.si'.format(it), (data_a, data_b))
+            save_file(trace_log, 'a', '{:<10}\t{:<10}\t{:<10}\t{:<10}\n'.format(
+                time.time() - start_time, it, coverage, cov_bits.count(1)))
+
             if new_coverage.any():
                 if multicore:
                     cNum = manager.read_num('cNum')
                     manager.write_num('cNum', cNum + 1)
 
                 if record:
-                    coverage = new_coverage.count(1)
                     save_file(cov_log, 'a', '{:<10}\t{:<10}\t{:<10}\t{:<10}\n'.
                               format(time.time() - start_time, start_iter + it,
                                      start_cov + coverage, cov_bits.count(1)))

@@ -110,10 +110,18 @@ if not os.path.isdir(out + '/contr_dist'):
 if not os.path.isdir(out + '/corpus'):
     os.makedirs(out + '/corpus')
 
+if not os.path.isdir(out + '/trace'):
+    os.makedirs(out + '/trace')
+
 date = datetime.today().strftime('%Y%m%d')
 cov_log = out + '/cov_log_{}.txt'.format(date)
 if (multicore or record) and not os.path.isfile(cov_log):
     save_file(cov_log, 'w', '{:<10}\t{:<10}\t{:<10}\t{:<10}\n'.
+              format('time', 'iter', 'new_bits', 'cov_bits'))
+    
+trace_log = out + '/trace_log_{}.txt'.format(date)
+if (multicore or record) and not os.path.isfile(trace_log):
+    save_file(trace_log, 'w', '{:<10}\t{:<10}\t{:<10}\t{:<10}\n'.
               format('time', 'iter', 'new_bits', 'cov_bits'))
 
 start_time = time.time()
@@ -132,6 +140,7 @@ if not multicore:
         factory = TestFactory(Run)
         parser.register_option(factory)
         factory.add_option('cov_log', [cov_log])
+        factory.add_option('trace_log', [trace_log])
         factory.add_option('start_time', [start_time])
 
     factory.generate_tests()

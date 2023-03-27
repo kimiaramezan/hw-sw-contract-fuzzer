@@ -11,6 +11,7 @@ from src.multicore_manager import proc_state, procManager
 
 from Fuzzer import Run
 from Minimizer import Minimize
+from Replay import Replay
 
 ### Multicore Fuzzing ###
 
@@ -53,12 +54,14 @@ parser.add_option('prob_intr', 0, 'Probability of asserting interrupt')
 parser.add_option('contract', 'ct', 'HW-SW contract to check')
 parser.add_option('isa', 'RV64I', 'RISC-V ISA subset to use')
 parser.add_option('no_guide', 0, 'Only random testing?')
+parser.add_option('replay', 0, 'replay n RTLSim programs')
 
 parser.print_help()
 parser.parse_option()
 
 out = parser.arg_map['out'][0]
 record = parser.arg_map['record'][0]
+replay = parser.arg_map['replay'][0]
 multicore = min(parser.arg_map['multicore'][0], 40)
 minimize = parser.arg_map['minimize'][0]
 parser.arg_map.pop('minimize', None)
@@ -119,10 +122,16 @@ if (multicore or record) and not os.path.isfile(cov_log):
     save_file(cov_log, 'w', '{:<10}\t{:<10}\t{:<10}\t{:<10}\n'.
               format('time', 'iter', 'new_bits', 'cov_bits'))
     
-trace_log = out + '/trace_log_{}.txt'.format(date)
-if (multicore or record) and not os.path.isfile(trace_log):
-    save_file(trace_log, 'w', '{:<10}\t{:<10}\t{:<10}\t{:<10}\n'.
-              format('time', 'iter', 'new_bits', 'cov_bits'))
+if replay:
+    trace_log = out + '/trace_replay_{}.txt'.format(date)
+    if not os.path.isfile(trace_log):
+        save_file(trace_log, 'w', '{:<10}\t{:<10}\t{:<10}\t{:<10}\n'.
+                    format('time', 'iter', 'new_bits', 'cov_bits'))
+else:
+    trace_log = out + '/trace_log_{}.txt'.format(date)
+    if (multicore or record) and not os.path.isfile(trace_log):
+        save_file(trace_log, 'w', '{:<10}\t{:<10}\t{:<10}\t{:<10}\n'.
+                format('time', 'iter', 'new_bits', 'cov_bits'))
 
 start_time = time.time()
 
@@ -135,6 +144,18 @@ if not multicore:
         factory.add_option('debug', [debug])
         factory.add_option('contract', [contract])
         factory.add_option('isa', [isa])
+
+    elif replay:
+        factory = TestFactory(Replay)
+        factory.add_option('replay', [replay])
+        factory.add_option('toplevel', [toplevel])
+        factory.add_option('template', [template])
+        factory.add_option('out', [out])
+        factory.add_option('debug', [debug])
+        factory.add_option('contract', [contract])
+        factory.add_option('isa', [isa])
+        factory.add_option('trace_log', [trace_log])
+        factory.add_option('start_time', [start_time])
 
     else:
         factory = TestFactory(Run)

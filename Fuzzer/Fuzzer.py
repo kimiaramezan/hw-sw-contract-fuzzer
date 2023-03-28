@@ -14,7 +14,7 @@ from src.multicore_manager import proc_state
 @coroutine
 def Run(dut, toplevel,
         num_iter=1, template='Template', in_file=None,
-        out='output', record=False, cov_log=None,
+        out='output', record=False, cov_log=None, replay=0,
         multicore=0, manager=None, proc_num=0, start_time=0, start_iter=0, start_cov=0,
         prob_intr=0, no_guide=False, debug=False, contract='ct', isa='RV64I', trace_log=None):
 

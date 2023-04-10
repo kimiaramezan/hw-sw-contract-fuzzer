@@ -16,6 +16,9 @@ TIME_OUT = 2 #TODO do we need this? Theoretically programs should terminate if s
 
 DRAM_BASE = 0x80000000
 
+ROCKET_COV_LEN = 1730
+BOOM_COV_LEN = 18808
+
 class rtlInput(): #GG now with two data sections
     def __init__(self, hexfile, intrfile, data_a, data_b, symbols, max_cycles):
         self.hexfile = hexfile
@@ -49,6 +52,11 @@ class rvRTLhost():
 
         self.coverage_map = bitarray(repeat(0,2 ** 16))
         self.coverage_bits = -1
+
+        if toplevel == "RocketTile":
+            self.cov_reset_val = int('1' * ROCKET_COV_LEN, 2)
+        else:
+            self.cov_reset_val = int('1' * BOOM_COV_LEN, 2)
 
     def debug_print(self, message):
         if self.debug:
@@ -96,6 +104,9 @@ class rvRTLhost():
         for i in range(timer):
             yield clkedge
         metaReset.value = 0
+
+        assert self.cov_output.value == self.cov_reset_val, '[meta] coverage not reset {}'.format(self.cov_output.value)
+
         reset.value = 1
         for i in range(timer):
             yield clkedge
@@ -195,7 +206,7 @@ class rvRTLhost():
 
         yield self.reset(clk, self.dut.metaReset, self.dut.reset)
 
-        assert self.cov_output.value == int('1'*1730,2), 'coverage not reset {}'.format(self.cov_output.value)
+        assert self.cov_output.value == self.cov_reset_val, 'coverage not reset {}'.format(self.cov_output.value)
 
         self.adapter.start(memory_a, memory_b, ints)
         for i in range(max_cycles):

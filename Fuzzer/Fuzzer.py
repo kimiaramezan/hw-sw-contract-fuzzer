@@ -11,6 +11,9 @@ from src.utils import *
 from src.multicore_manager import proc_state
 
 
+ROCKET_COV_LEN = 1730
+BOOM_COV_LEN = 18808
+
 @coroutine
 def Run(dut, toplevel,
         num_iter=1, template='Template', in_file=None,
@@ -34,7 +37,13 @@ def Run(dut, toplevel,
     rtNum = 0
     htNum = 0
     cdNum = 0
-    last_coverage = bitarray(repeat(0,1730)) #TODO adapt to toplevel design
+
+    if toplevel == "RocketTile":
+        cov_len = ROCKET_COV_LEN
+    else:
+        cov_len = BOOM_COV_LEN
+
+    last_coverage = bitarray(repeat(0, cov_len)) 
 
     debug_print('[DifuzzRTL] Start Fuzzing', debug)
 
@@ -141,7 +150,7 @@ def Run(dut, toplevel,
                 debug_print('[DifuzzRTL] Bug -- {} [RTL Timeout]'. \
                             format(rtNum), debug, True)
             
-            cov_bits = int2ba(cov_bits, length=1730, endian='big')
+            cov_bits = int2ba(cov_bits, length=cov_len, endian='big')
             cov_bits = ~cov_bits #change to 1 indicating a difference
             new_coverage = ~last_coverage & cov_bits
             coverage = new_coverage.count(1)

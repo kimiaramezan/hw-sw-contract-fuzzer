@@ -165,8 +165,9 @@ def Run(dut, toplevel,
             debug_print("new_cov#:{}".format(coverage), debug, False)
                         
             sim_input.save(out + '/trace/id_{}.si'.format(it), (data_a, data_b))
-            save_file(trace_log, 'a', '{:<10}\t{:<10}\t{:<10}\t{:<10}\n'.format(
-                time.time() - start_time, it, coverage, cov_map.count(1)))
+            if record:
+                save_file(trace_log, 'a', '{:<10}\t{:<10}\t{:<10}\t{:<10}\n'.format(
+                    time.time() - start_time, it, coverage, cov_map.count(1)))
 
             if new_coverage.any():
                 if multicore:

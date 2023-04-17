@@ -44,6 +44,18 @@ def Minimize(dut, toplevel,
             for inst, INT in zip(sim_input.get_insts(), sim_input.ints + [0]):
                 print('{:<50}{:04b}'.format(inst, INT))
 
+        (isa_input, rtl_input, symbols) = preprocessor.process(sim_input, data_a, data_b, assert_intr)
+
+        try:
+            (ret, coverage) = yield rtlHost.run_test(rtl_input, assert_intr)
+        except:
+            stop[0] = proc_state.ERR_RTL_SIM
+            break
+        
+        if ret != LEAK:
+            print('Leak not reproducible')
+            continue
+
         min_input = deepcopy(sim_input)
 
         for part in [ PREFIX, MAIN, SUFFIX ]:

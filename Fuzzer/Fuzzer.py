@@ -43,7 +43,8 @@ def Run(dut, toplevel,
     else:
         cov_len = BOOM_COV_LEN
 
-    last_coverage = bitarray(repeat(0, cov_len)) 
+    last_coverage = bitarray(repeat(0,2 ** 16))
+    old_cov_bits = bitarray(repeat(0, cov_len)) 
 
     debug_print('[DifuzzRTL] Start Fuzzing', debug)
 
@@ -75,6 +76,7 @@ def Run(dut, toplevel,
 
         if hsc_input and rtl_input:
             ret = hscHost.run_test(hsc_input, stop)
+            mutator.update_data_seed_energy(sim_input.get_seed(), ret==proc_state.ERR_CONTR_DIST)
             if ret == proc_state.ERR_HSC_TIMEOUT: 
                 save_mismatch(out, proc_num, out + '/hsc_timeout',
                                   sim_input, (data_a, data_b), htNum)
@@ -150,17 +152,21 @@ def Run(dut, toplevel,
                 debug_print('[DifuzzRTL] Bug -- {} [RTL Timeout]'. \
                             format(rtNum), debug, True)
             
+            #leagacy fun stuff
             cov_bits = int2ba(cov_bits, length=cov_len, endian='big')
             cov_bits = ~cov_bits #change to 1 indicating a difference
-            new_coverage = ~last_coverage & cov_bits
+            old_cov_bits = cov_bits | old_cov_bits
+            
+            # real coverage parameters
+            new_coverage = ~last_coverage & cov_map
             coverage = new_coverage.count(1)
             
-            debug_print("new_cov:{}".format(new_coverage), debug, False)
-            debug_print("new_cov#:{}".format(new_coverage.count(1)), debug, False)
+            debug_print("old_cov:{}".format(old_cov_bits.count(1)), debug, False)
+            debug_print("new_cov#:{}".format(coverage), debug, False)
                         
             sim_input.save(out + '/trace/id_{}.si'.format(it), (data_a, data_b))
             save_file(trace_log, 'a', '{:<10}\t{:<10}\t{:<10}\t{:<10}\n'.format(
-                time.time() - start_time, it, coverage, cov_bits.count(1)))
+                time.time() - start_time, it, coverage, cov_map.count(1)))
 
             if new_coverage.any():
                 if multicore:
@@ -170,12 +176,12 @@ def Run(dut, toplevel,
                 if record:
                     save_file(cov_log, 'a', '{:<10}\t{:<10}\t{:<10}\t{:<10}\n'.
                               format(time.time() - start_time, start_iter + it,
-                                     start_cov + coverage, cov_bits.count(1)))
+                                     start_cov + coverage, cov_map.count(1)))
                     sim_input.save(out + '/corpus/id_{}.si'.format(cNum))
 
                 cNum += 1
                 mutator.add_corpus(sim_input)
-                last_coverage = last_coverage | cov_bits
+                last_coverage = last_coverage | cov_map
 
             mutator.update_phase(it)
 
@@ -188,7 +194,7 @@ def Run(dut, toplevel,
         save_err(out, proc_num, manager, stop[0])
         manager.set_state(proc_num, stop[0])
 
-    debug_print('[DifuzzRTL] Stop Fuzzing', debug)
+    debug_print('[DifuzzRTL] Stop Fuzzing, total {} cov_points'.format(last_coverage.count(1)), debug)
 
     if multicore:
         yield manager.cov_store(dut, proc_num)

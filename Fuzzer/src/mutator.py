@@ -114,6 +114,7 @@ class rvMutator():
         self.max_data = max_data_seeds
         self.random_data = {}
         self.data_seeds = []
+        self.seed_energy = {}
 
         self.inst_generator = rvInstGenerator(isa)
 
@@ -126,11 +127,31 @@ class rvMutator():
         if new_data[0] and new_data[1]:
             self.random_data[seed] = new_data
         else:
-            self.random_data[seed] =   ([random.randint(0, 0xffffffffffffffff) for i in range(64 * 6)],
-                                        [random.randint(0, 0xffffffffffffffff) for i in range(64 * 6)]) # TODO, Num_data_sections = 6
+            rand = random.random()
+            if rand < 0.5:
+                self.random_data[seed] =   ([random.randint(0, 0xffffffffffffffff) for i in range(64 * 6)],
+                                            [random.randint(0, 0xffffffffffffffff) for i in range(64 * 6)]) # TODO, Num_data_sections = 6
+            else:
+                a = [random.randint(0, 0xffffffffffffffff) for i in range(64 * 6)]
+                b = a.copy()
+                for i in range(32, len(a)):
+                    rand = random.random()
+                    if rand < 0.5:
+                        b[i] = random.randint(0, 0xffffffffffffffff)
+
+                self.random_data[seed] = (a ,b)
         self.data_seeds.append(seed)
 
         return seed
+    
+    def update_data_seed_energy(self, seed, contr_dist):
+        energy = self.seed_energy.setdefault(seed, 0)
+        if contr_dist:
+            self.seed_energy[seed] = energy - 1
+            print("seed {} was distinguishable and downgraded to {}".format(seed, self.seed_energy[seed]))
+        else:
+            self.seed_energy[seed] = energy + 1
+            print("seed {} succeeded and upgraded to {}".format(seed, self.seed_energy[seed]))
 
     def update_data_seeds(self, seed):
         assert self.data_seeds.count(seed) == 1, \
@@ -140,6 +161,26 @@ class rvMutator():
         idx = self.data_seeds.index(seed)
         self.data_seeds.pop(idx)
         self.data_seeds.append(seed)
+
+        if self.seed_energy[seed] < -10:
+            print("seed {} is being refreshed".format(seed))
+            self.refresh_seed(seed)
+
+    def refresh_seed(self, seed):
+        self.seed_energy[seed] = 0
+        rand = random.random()
+        if rand < 0.5:
+            self.random_data[seed] =   ([random.randint(0, 0xffffffffffffffff) for i in range(64 * 6)],
+                                        [random.randint(0, 0xffffffffffffffff) for i in range(64 * 6)]) # TODO, Num_data_sections = 6
+        else:
+            a = [random.randint(0, 0xffffffffffffffff) for i in range(64 * 6)]
+            b = a.copy()
+            for i in range(32, len(a)):
+                rand = random.random()
+                if rand < 0.5:
+                    b[i] = random.randint(0, 0xffffffffffffffff)
+
+            self.random_data[seed] = (a ,b)
 
     def read_label(self, line, tuples):
         label = line[:8].split(':')[0]

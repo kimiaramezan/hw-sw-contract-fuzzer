@@ -51,6 +51,7 @@ class rvRTLhost():
         self.adapter = tileAdapter(dut, port_names, monitor, self.debug)
 
         self.coverage_map = bitarray(repeat(0,2 ** 16))
+        self.last_idx = 0
         self.coverage_bits = -1
 
         if toplevel == "RocketTile":
@@ -113,9 +114,10 @@ class rvRTLhost():
         reset.value = 0
     
     def cov_gen(self):
-        idx = 1#int.from_bytes(shake_128(self.cov_output.value.buff).digest(2), byteorder='big')
-        #self.debug_print('idx: {}'.format(idx))
-        self.coverage_map[idx] = 1
+        idx = int.from_bytes(shake_128(self.cov_output.value.buff).digest(2), byteorder='big')
+        self.debug_print('idx: {}'.format(idx ^ self.last_idx))
+        self.coverage_map[idx ^ self.last_idx] = 1
+        self.last_idx = idx >> 1
 
         if self.coverage_bits != -1:
             self.coverage_bits = self.coverage_bits & self.cov_output.value
@@ -146,7 +148,8 @@ class rvRTLhost():
 
         self.debug_print('[RTLHost] Start RTL simulation')
 
-        #self.coverage_map = bitarray(repeat(0,2 ** 16))
+        self.coverage_map = bitarray(repeat(0,2 ** 16))
+        self.last_idx = 0
         self.coverage_bits = -1
 
         fd = open(rtl_input.hexfile, 'r')

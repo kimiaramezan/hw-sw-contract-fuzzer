@@ -99,7 +99,7 @@ class rvPreProcessor():
             if cc_ret != -9: break
         return cc_ret
 
-    def process(self, sim_input: simInput, data_a: list, data_b: list, intr: bool, num_data_sections=6): # data in elf and hex files, but adapter uses python data lists
+    def process(self, sim_input: simInput, data_a: list, data_b: list, intr: bool, num_data_sections=6, id = 0): # data in elf and hex files, but adapter uses python data lists
         section_size = len(data_a) // num_data_sections
 
         assert len(data_a) == len(data_b), 'data sections have to be of equal length'
@@ -120,15 +120,15 @@ class rvPreProcessor():
                                    '{}/include/v/string.c'.format(self.template),
                                    '{}/include/v/vm.c'.format(self.template) ]
 
-        si_name = self.base + '/.input_{}.si'.format(self.proc_num)
-        asm_name_a = self.base + '/.input_{}_a.S'.format(self.proc_num)
-        asm_name_b = self.base + '/.input_{}_b.S'.format(self.proc_num)
-        elf_name_a = self.base + '/.input_{}_a.elf'.format(self.proc_num)
-        elf_name_b = self.base + '/.input_{}_b.elf'.format(self.proc_num)
-        hex_name = self.base + '/.input_{}.hex'.format(self.proc_num)
-        sym_name = self.base + '/.input_{}.symbols'.format(self.proc_num)
-        rtl_intr_name = self.base + '/.input_{}.rtl.intr'.format(self.proc_num)
-        isa_intr_name = self.base + '/.input_{}.isa.intr'.format(self.proc_num)
+        si_name = self.base + '/.input_{}.si'.format(id)
+        asm_name_a = self.base + '/.input_{}_a.S'.format(id)
+        asm_name_b = self.base + '/.input_{}_b.S'.format(id)
+        elf_name_a = self.base + '/.input_{}_a.elf'.format(id)
+        elf_name_b = self.base + '/.input_{}_b.elf'.format(id)
+        hex_name = self.base + '/.input_{}.hex'.format(id)
+        sym_name = self.base + '/.input_{}.symbols'.format(id)
+        rtl_intr_name = self.base + '/.input_{}.rtl.intr'.format(id)
+        isa_intr_name = self.base + '/.input_{}.isa.intr'.format(id)
 
         sim_input_ints = sim_input.ints.copy()
         insts = sim_input.get_insts()
@@ -187,4 +187,4 @@ class rvPreProcessor():
             rtl_input = None
             symbols = None
 
-        return (hsc_input, rtl_input, symbols)
+        return (hsc_input, si_name, symbols)

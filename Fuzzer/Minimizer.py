@@ -1,25 +1,31 @@
 import os
 import math
-from threading import Timer
 from copy import deepcopy
 
-from cocotb.decorators import coroutine
 from RTLSim.host import NO_LEAK, TIME_OUT, LEAK
 from src.word import PREFIX, MAIN, SUFFIX
 
 from src.utils import *
 from src.multicore_manager import proc_state
 
-@coroutine
-def Minimize(dut, toplevel,
+ROCKET_CONF = ('RocketTile', '~/Documents/fuzz_bin_rocket', 'rocket_tile_inst_reset')
+BOOM_CONF = ('BoomTile', '~/Documents/fuzz_bin', 'boom_cov_reset')
+
+def Minimize(target,
              template='Template', out='output', num_cores=1, proc_num=0,
              debug=False, contract='ct', isa='RV64I'):
+    
+    assert target in ['Rocket', 'Boom' ], \
+        '{} is not toplevel'.format(target)
+    proc_num = 0
 
-    assert toplevel in ['RocketTile', 'BoomTile' ], \
-        '{} is not toplevel'.format(toplevel)
+    if target == 'Rocket':
+        toplevel, bin_dir, v_file = ROCKET_CONF
+    else:
+        toplevel, bin_dir, v_file = BOOM_CONF
 
-    (mutator, preprocessor, hscHost, rtlHost, checker) = \
-        setupHSC(dut, toplevel, template, out, proc_num, debug, contract, isa, minimizing=True)
+    (mutator, preprocessor, hscHost) = \
+        setupHSC(template, out, proc_num, debug, contract, isa)
 
     in_dir = out + '/leaks/sim_input'
     stop = [ proc_state.NORMAL ]
@@ -28,29 +34,25 @@ def Minimize(dut, toplevel,
     if not os.path.isdir(min_dir):
         os.makedirs(min_dir)
 
-    print('[DifuzzRTL] Start Minimizing')
+    print('[HSCFuzz] Start Minimizing {}'.format(out))
 
-    siNames = os.listdir(in_dir)
+    siNames = list(filter(lambda x: '.si' == x[-3:], [f for f in os.listdir(in_dir) if os.path.isfile(os.path.join(in_dir, f))]))
     start = proc_num * ((len(siNames) // num_cores) + 1)
     end = (proc_num + 1) * ((len(siNames) // num_cores) + 1)
     for siName in siNames[start:end]:
-        print('[DifuzzRTL] Minimizing {}'.format(siName))
+        print('[HSCFuzz] Minimizing {}'.format(siName))
 
         minName = min_dir + '/' + siName.split('.si')[0] + '_min.si'
         (sim_input, (data_a, data_b), assert_intr) = mutator.read_siminput(in_dir + '/' + siName)
 
         if debug:
-            print('[DifuzzRTl] Original Instructions')
+            print('[HSCFuzz] Original Instructions')
             for inst, INT in zip(sim_input.get_insts(), sim_input.ints + [0]):
                 print('{:<50}{:04b}'.format(inst, INT))
 
         (isa_input, rtl_input, symbols) = preprocessor.process(sim_input, data_a, data_b, assert_intr)
 
-        try:
-            (ret, coverage) = yield rtlHost.run_test(rtl_input, assert_intr)
-        except:
-            stop[0] = proc_state.ERR_RTL_SIM
-            break
+        (ret, coverage, _, _) = run_rtl_test(bin_dir, v_file, toplevel, rtl_input, 0, None)
         
         if ret != LEAK:
             print('Leak not reproducible')
@@ -102,7 +104,7 @@ def Minimize(dut, toplevel,
                         (tmp_input, (data_a, data_b)) = mutator.delete_nop(min_input)
 
                     if debug:
-                        print('[DifuzzRTL] Minimized Instructions')
+                        print('[HSCFuzz] Minimized Instructions')
                         for inst in tmp_input.get_insts():
                             print(inst)
 
@@ -116,11 +118,7 @@ def Minimize(dut, toplevel,
                             print('[Minimizer] {} minimize leads to Sail non-zero exit'.format(siName))
                             break
 
-                        try:
-                            (ret, coverage) = yield rtlHost.run_test(rtl_input, assert_intr)
-                        except:
-                            stop[0] = proc_state.ERR_RTL_SIM
-                            break
+                        (ret, coverage, _, _) = run_rtl_test(bin_dir, v_file, toplevel, rtl_input, 0, None)
 
                         # GG not handling interrupt at the moment
                         # if assert_intr and ret == NO_LEAK:
@@ -140,4 +138,4 @@ def Minimize(dut, toplevel,
 
                 min_input.save(minName, (data_a, data_b))
 
-    debug_print('[DifuzzRTL] Stop Minimizing', debug)
+    debug_print('[HSCFuzz] Stop Minimizing', debug)

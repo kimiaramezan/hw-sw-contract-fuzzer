@@ -1,0 +1,5 @@
+cocotb == 1.5.2
+bitarray
+psutil
+pytest
+sysv-ipc

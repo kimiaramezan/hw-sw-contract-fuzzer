@@ -1,9 +1,11 @@
 __pycache__
 .ccls-cache
 .direnv
+.envrc
 elf2hex
 build
-Fuzzer/results.xml
+Fuzzer/logs
+Fuzzer/results*.xml
 firrtl/utils/bin/firrtl.jar
 firrtl/regress/Rocket.v
 firrtl/RocketTile_hierarchy.txt

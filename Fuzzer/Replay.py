@@ -9,8 +9,7 @@ from src.word import PREFIX, MAIN, SUFFIX
 from src.utils import *
 from src.multicore_manager import proc_state
 
-ROCKET_CONF = ('RocketTile', '~/Documents/fuzz_bin_rocket', 'rocket_tile_inst_reset')
-BOOM_CONF = ('BoomTile', '~/Documents/fuzz_bin', 'boom_cov_reset')
+from Config import ROCKET_CONF, BOOM_CONF
 
 def Replay(target, in_file=None,
              template='Template', proc_num=0,

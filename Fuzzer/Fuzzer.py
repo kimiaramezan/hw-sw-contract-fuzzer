@@ -8,12 +8,10 @@ from bitarray.util import int2ba
 from src.utils import *
 from src.multicore_manager import proc_state
 
+from Config import ROCKET_CONF, BOOM_CONF
 
 ROCKET_COV_LEN = 1730
 BOOM_COV_LEN = 18808
-
-ROCKET_CONF = ('RocketTile', '~/Documents/fuzz_bin_rocket', 'rocket_tile_inst_reset')
-BOOM_CONF = ('BoomTile', '~/Documents/fuzz_bin', 'boom_cov_reset')
 
 def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, record=True,
         out='output', cov_log=None, contract='ct', isa='RV64I', trace_log=None, cores=0):
@@ -44,7 +42,7 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
     htNum = 0
     cdNum = 0
 
-    last_coverage = bitarray(repeat(0,2 ** 16))
+    last_coverage = bitarray(repeat(0,2 ** 24)) # UP
 
     debug_print('[HSCFuzz] Start Fuzzing', debug)
 
@@ -59,7 +57,9 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
 
     futures = []
 
-    while rt < num_iter:
+    gen_done = False
+    sim_tasks = 0
+    while not gen_done or rt < sim_tasks:
 
         assert_intr = False
         # if random.random() < prob_intr:
@@ -78,16 +78,20 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
 
             if hsc_input and rtl_input:
                 ret = hscHost.run_test(hsc_input, stop)
-                mutator.update_data_seed_energy(sim_input.get_seed(), ret==proc_state.ERR_CONTR_DIST)
+                # mutator.update_data_seed_energy(sim_input.get_seed(), ret==proc_state.ERR_CONTR_DIST)
                 if ret == proc_state.ERR_HSC_TIMEOUT: 
                     save_mismatch(out, out + '/hsc_timeout', it, htNum)
                     htNum += 1
                     debug_print('[HSCHost] timeout', debug, True)
                     continue
                 elif ret == proc_state.ERR_CONTR_DIST: 
-                    save_mismatch(out, out + '/contr_dist', it, cdNum)
+                    # save_mismatch(out, out + '/contr_dist', it, cdNum)
+                    cleanup(rtl_input)
                     cdNum += 1
                     debug_print('[HSCHost] contract distinguishable', debug, True)
+                    it += 1 # we only want ever want to generate it many inputs
+                    if it == num_iter:
+                        gen_done = True
                     continue
                 elif ret == proc_state.ERR_HSC_ASSERT: # exit, temporary files stay available to debug sail
                     debug_print('[HSCHost] non-zero exit code', debug, True)
@@ -96,7 +100,11 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
                 f = executor.submit(run_rtl_test, bin_dir, v_file, toplevel, rtl_input, it, sim_input)
                 futures.append(f)
                 it += 1
-            mutator.update_phase(it)
+                sim_tasks += 1
+                if it == num_iter:
+                    gen_done = True
+
+            mutator.update_phase(sim_tasks)
 
         debug_print('[HSCFuzz] Iteration [{}]'.format(it), debug)
         for f in as_completed(futures):
@@ -133,8 +141,8 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
             #     iNum += 1
 
             elif ret == LEAK: #not match or ret not in [NO_LEAK, ILL_MEM]:
-                if record:
-                    save_leak(out, out + '/leaks', run_id, lNum)
+                # if record:
+                #     save_leak(out, out + '/leaks', run_id, lNum)
 
                 lNum += 1
 
@@ -143,8 +151,8 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
                 
             elif ret == TIME_OUT:
 
-                if record:
-                    save_leak(out, out + '/rtl_timeout', run_id, rtNum)
+                # if record:
+                #     save_leak(out, out + '/rtl_timeout', run_id, rtNum)
 
                 rtNum += 1
                 debug_print('[HSCFuzz] Bug #{} -- {} [RTL Timeout]'. \
@@ -186,3 +194,6 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
         
     #TODO remove trace or move sim_inputs as trace saving
     print('[HSCFuzz] Stop Fuzzing, total {} cov_points'.format(last_coverage.count(1)))
+    print('[HSCFuzz] {} sim, {} dist, {} leak'.format(rt, cdNum, lNum))
+    print('[HSCFuzz] {} cov, {} rto'.format(cNum, rtNum))
+

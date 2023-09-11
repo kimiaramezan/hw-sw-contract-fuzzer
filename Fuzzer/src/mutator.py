@@ -149,6 +149,11 @@ class rvMutator():
         if contr_dist:
             self.seed_energy[seed] = energy - 1
             print("seed {} was distinguishable and downgraded to {}".format(seed, self.seed_energy[seed]))
+
+            if self.seed_energy[seed] < -10:
+                print("seed {} is being refreshed".format(seed))
+                self.refresh_seed(seed)
+
         else:
             self.seed_energy[seed] = energy + 1
             print("seed {} succeeded and upgraded to {}".format(seed, self.seed_energy[seed]))
@@ -161,10 +166,6 @@ class rvMutator():
         idx = self.data_seeds.index(seed)
         self.data_seeds.pop(idx)
         self.data_seeds.append(seed)
-
-        if self.seed_energy[seed] < -10:
-            print("seed {} is being refreshed".format(seed))
-            self.refresh_seed(seed)
 
     def refresh_seed(self, seed):
         self.seed_energy[seed] = 0

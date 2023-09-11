@@ -166,6 +166,11 @@ def run_rtl_test(bin_dir, v_file, toplevel, sim_input_name, id, sim_input):
     b.fromfile(fd)
     fd.close()
 
+    if leak:
+        save_leak(dir, dir + '/leaks', id, id)
+
+    os.remove(cov_out)
+    os.remove(sim_input_name)
     os.remove(os.path.join(dir, fname + '_a.S'))
     os.remove(os.path.join(dir, fname + '_b.S'))
     os.remove(os.path.join(dir, fname + '_a.elf'))
@@ -175,3 +180,16 @@ def run_rtl_test(bin_dir, v_file, toplevel, sim_input_name, id, sim_input):
     os.remove(os.path.join(os.getcwd(), res_file))
 
     return (LEAK if leak else NO_LEAK, b, id, sim_input) #TODO detect timeout and errors
+
+def cleanup(sim_input_name):
+    
+    dir, fname = os.path.split(sim_input_name)
+    fname = fname.split('.si')[0]
+
+    os.remove(sim_input_name)
+    os.remove(os.path.join(dir, fname + '_a.S'))
+    os.remove(os.path.join(dir, fname + '_b.S'))
+    os.remove(os.path.join(dir, fname + '_a.elf'))
+    os.remove(os.path.join(dir, fname + '_b.elf'))
+    os.remove(os.path.join(dir, fname + '.hex'))
+    os.remove(os.path.join(dir, fname + '.symbols'))

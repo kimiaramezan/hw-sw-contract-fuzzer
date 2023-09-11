@@ -42,27 +42,29 @@ class rvHSChost():
 
         self.debug_print('[HSCHost] Start contract checking')     
         args_a = sail_args + [ hsc_input.binary_a, '-o', self.out_a]
-        timer = Timer(HSC_TIME_LIMIT, self.timeout, [stop])
-        timer.start()
+        # timer = Timer(HSC_TIME_LIMIT, self.timeout, [stop])
+        # timer.start()
         a_ret = subprocess.call(args_a) #TODO parallelize with other call for b
-        timer.cancel()
+        # timer.cancel()
         
-        if stop[0] == proc_state.ERR_HSC_TIMEOUT:
-            stop[0] = proc_state.NORMAL
-            return proc_state.ERR_HSC_TIMEOUT
-        elif a_ret != 0:
+        # if stop[0] == proc_state.ERR_HSC_TIMEOUT:
+        #     stop[0] = proc_state.NORMAL
+        #     return proc_state.ERR_HSC_TIMEOUT
+        # el
+        if a_ret != 0:
             return proc_state.ERR_HSC_ASSERT
 
         args_b = sail_args + [ hsc_input.binary_b, '-o', self.out_b]
-        timer = Timer(HSC_TIME_LIMIT, self.timeout, [stop])
-        timer.start()
+        # timer = Timer(HSC_TIME_LIMIT, self.timeout, [stop])
+        # timer.start()
         b_ret = subprocess.call(args_b)
-        timer.cancel()
+        # timer.cancel()
 
-        if stop[0] == proc_state.ERR_HSC_TIMEOUT:
-            stop[0] = proc_state.NORMAL
-            return proc_state.ERR_HSC_TIMEOUT
-        elif b_ret != 0:
+        # if stop[0] == proc_state.ERR_HSC_TIMEOUT:
+        #     stop[0] = proc_state.NORMAL
+        #     return proc_state.ERR_HSC_TIMEOUT
+        # el
+        if b_ret != 0:
             return proc_state.ERR_HSC_ASSERT
 
         if filecmp.cmp(self.out_a, self.out_b, shallow=False):

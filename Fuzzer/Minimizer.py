@@ -49,12 +49,18 @@ def Minimize(target,
             for inst, INT in zip(sim_input.get_insts(), sim_input.ints + [0]):
                 print('{:<50}{:04b}'.format(inst, INT))
 
-        (isa_input, rtl_input, symbols) = preprocessor.process(sim_input, data_a, data_b, assert_intr)
+        (hsc_input, rtl_input, symbols) = preprocessor.process(sim_input, data_a, data_b, assert_intr)
+
+        ret = hscHost.run_test(hsc_input, stop)
+
+        if ret == proc_state.ERR_CONTR_DIST:
+            print('[Minimizer] {} contr dist'.format(siName))
+            continue
 
         (ret, coverage, _, _) = run_rtl_test(bin_dir, v_file, toplevel, rtl_input, 0, None)
         
         if ret != LEAK:
-            print('Leak not reproducible')
+            print('[Minimizer] {} leak not reproducible'.format(siName))
             continue
 
         min_input = deepcopy(sim_input)
@@ -112,7 +118,9 @@ def Minimize(target,
                     if isa_input and rtl_input:
                         ret = hscHost.run_test(isa_input, stop)
                         if ret == proc_state.ERR_HSC_TIMEOUT: continue # this should not happen as execution time with no-ops should be lower
-                        if ret == proc_state.ERR_CONTR_DIST: continue # this should not happen as replacing a command with no-ops should lead to less leakage
+                        if ret == proc_state.ERR_CONTR_DIST:
+                            print('[Minimizer] {} minimize leads to contr dist'.format(siName))
+                            break# this should not happen as replacing a command with no-ops should lead to less leakage
                         if ret == proc_state.ERR_HSC_ASSERT: # this should not happen as replacing a command with no-ops should not lead to faults
                             print('[Minimizer] {} minimize leads to Sail non-zero exit'.format(siName))
                             break

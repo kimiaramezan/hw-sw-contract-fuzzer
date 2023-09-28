@@ -8,10 +8,8 @@ from bitarray.util import int2ba
 from src.utils import *
 from src.multicore_manager import proc_state
 
-from Config import ROCKET_CONF, BOOM_CONF
+from Config import ROCKET_CONF, BOOM_CONF, DATA_GUIDANCE, Feedback, FEEDBACK
 
-ROCKET_COV_LEN = 1730
-BOOM_COV_LEN = 18808
 
 def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, record=True,
         out='output', cov_log=None, contract='ct', isa='RV64I', trace_log=None, cores=0):
@@ -24,14 +22,14 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
     start_time = time.time()
 
     if target == 'Rocket':
-        toplevel, bin_dir, v_file = ROCKET_CONF
+        toplevel, bin_dir, v_file, cov_len = ROCKET_CONF
     else:
-        toplevel, bin_dir, v_file = BOOM_CONF
+        toplevel, bin_dir, v_file, cov_len = BOOM_CONF
 
     random.seed(time.time() * (proc_num + 1))
 
     (mutator, preprocessor, hscHost) = \
-        setupHSC(template, out, proc_num, debug, contract, isa)
+        setupHSC(template, out, proc_num, debug, contract, isa, FEEDBACK == Feedback.NO_FB)
 
     if in_file: num_iter = 1
 
@@ -78,7 +76,8 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
 
             if hsc_input and rtl_input:
                 ret = hscHost.run_test(hsc_input, stop)
-                # mutator.update_data_seed_energy(sim_input.get_seed(), ret==proc_state.ERR_CONTR_DIST)
+                if DATA_GUIDANCE:
+                    mutator.update_data_seed_energy(sim_input.get_seed(), ret==proc_state.ERR_CONTR_DIST)
                 if ret == proc_state.ERR_HSC_TIMEOUT: 
                     save_mismatch(out, out + '/hsc_timeout', it, htNum)
                     htNum += 1
@@ -183,8 +182,12 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
                     run_input.save(out + '/corpus/id_{}.si'.format(cNum))
 
                 cNum += 1
-                mutator.add_corpus(run_input)
+                if FEEDBACK == Feedback.COVERAGE_FB:
+                    mutator.add_corpus(run_input)
                 last_coverage = last_coverage | cov_map
+
+            if FEEDBACK == Feedback.PASS_FB:
+                mutator.add_corpus(run_input)
 
             futures.remove(f)
             rt += 1

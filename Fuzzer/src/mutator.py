@@ -1,6 +1,7 @@
 import os
 import random
 from copy import deepcopy
+from Config import DATA_EQ_REGISTERS, DATA_GUIDANCE, DATA_50_50
 
 from inst_generator import Word, rvInstGenerator, PREFIX, MAIN, SUFFIX
 
@@ -118,7 +119,7 @@ class rvMutator():
 
         self.inst_generator = rvInstGenerator(isa)
 
-    def add_data(self, new_data=([],[])): #TODO add data mutation
+    def add_data(self, new_data=([],[])): #TODO config seq-ct or seq-arch and random or 50-50 approach
         if len(self.data_seeds) == self.max_data:
             seed = self.data_seeds.pop(0)
         else:
@@ -128,13 +129,15 @@ class rvMutator():
             self.random_data[seed] = new_data
         else:
             rand = random.random()
-            if rand < 0.5:
+            if rand < 0.5 or not DATA_50_50:
                 self.random_data[seed] =   ([random.randint(0, 0xffffffffffffffff) for i in range(64 * 6)],
                                             [random.randint(0, 0xffffffffffffffff) for i in range(64 * 6)]) # TODO, Num_data_sections = 6
             else:
                 a = [random.randint(0, 0xffffffffffffffff) for i in range(64 * 6)]
                 b = a.copy()
-                for i in range(32, len(a)):
+                
+                start = 32 if DATA_EQ_REGISTERS else 0
+                for i in range(start, len(a)):
                     rand = random.random()
                     if rand < 0.5:
                         b[i] = random.randint(0, 0xffffffffffffffff)

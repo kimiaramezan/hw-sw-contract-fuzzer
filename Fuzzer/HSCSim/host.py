@@ -11,7 +11,7 @@ from src.multicore_manager import proc_state
 HSC_TIME_LIMIT = 1 #time in seconds
 
 def find_exception(string):
-    pattern = r'^handling exc#0x0((?!8|9|b|B)\w)'
+    pattern = r'^handling exc#0x0((?!8|9|B)\w)'
     match = re.search(pattern, string, re.MULTILINE)
     return match
 

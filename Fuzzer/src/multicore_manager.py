@@ -14,6 +14,7 @@ ERR_HSC_TIMEOUT = 3
 ERR_RTL_SIM     = 4
 ERR_SI_READ     = 5
 ERR_CONTR_DIST  = 6
+ERR_RV_EXC      = 7
 
 class procState():
     def __init__(self):
@@ -24,6 +25,7 @@ class procState():
         self.ERR_RTL_SIM = ERR_RTL_SIM
         self.ERR_SI_READ = ERR_SI_READ
         self.ERR_CONTR_DIST = ERR_CONTR_DIST
+        self.ERR_RV_EXC = ERR_RV_EXC
 
         self.tpe = {
             NORMAL: 'NORMAL',
@@ -32,7 +34,8 @@ class procState():
             ERR_HSC_ASSERT: 'ERR_HSC_ASSERT',
             ERR_RTL_SIM: 'ERR_RTL_SIM',
             ERR_SI_READ: 'ERR_SI_READ',
-            ERR_CONTR_DIST: 'ERR_CONTR_DIST'
+            ERR_CONTR_DIST: 'ERR_CONTR_DIST',
+            ERR_RV_EXC: 'ERR_RV_EXC'
         }
 
 

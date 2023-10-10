@@ -120,8 +120,8 @@ def setupHSC(template, out, proc_num, debug, contract='ct', isa='RV64I', no_guid
     hsc_outfiles = (out + '/.hsc_out_{}_a.txt'.format(proc_num), out + '/.hsc_out_{}_b.txt'.format(proc_num))
     # rtl_sigfile = out + '/.rtl_sig_{}.txt'.format(proc_num)
 
-    if debug: sail_arg = ['-V'] # [] change for sail debug output
-    else: sail_arg = ['-V']
+    if debug: sail_arg = ['-v'] # [] change for sail debug output
+    else: sail_arg = ['-V', '-vplatform']
 
     sail_arg += ['-L', contract] # use contract from input argument
 

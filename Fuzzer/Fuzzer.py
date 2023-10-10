@@ -77,7 +77,7 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
             if hsc_input and rtl_input:
                 ret = hscHost.run_test(hsc_input, stop)
                 if DATA_GUIDANCE:
-                    mutator.update_data_seed_energy(sim_input.get_seed(), ret==proc_state.ERR_CONTR_DIST)
+                    mutator.update_data_seed_energy(sim_input.get_seed(), ret==proc_state.ERR_CONTR_DIST or ret==proc_state.ERR_RV_EXC)
                 if ret == proc_state.ERR_HSC_TIMEOUT: 
                     save_mismatch(out, out + '/hsc_timeout', it, htNum)
                     htNum += 1
@@ -91,6 +91,10 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
                     it += 1 # we only want ever want to generate it many inputs
                     if it == num_iter:
                         gen_done = True
+                    continue
+                elif ret == proc_state.ERR_RV_EXC:
+                    cleanup(rtl_input) # discard RISC-V-exception-triggering input
+                    debug_print('[HSCHost] input triggers RISC-V exception', debug, True)
                     continue
                 elif ret == proc_state.ERR_HSC_ASSERT: # exit, temporary files stay available to debug sail
                     debug_print('[HSCHost] non-zero exit code', debug, True)

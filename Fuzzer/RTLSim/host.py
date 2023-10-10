@@ -42,6 +42,12 @@ class rvRTLhost():
         monitor_valid = paths['monitor_valid']
         monitor = (monitor_pc, monitor_valid)
 
+        self.pc_a = getattr(dut, monitor_pc[0])
+        self.pc_valid_a = getattr(dut, monitor_valid[0])
+
+        self.pc_b = getattr(dut, monitor_pc[1])
+        self.pc_valid_b = getattr(dut, monitor_valid[1])
+
         self.rtl_sig_file = rtl_sig_file
         self.debug = debug
 
@@ -124,6 +130,16 @@ class rvRTLhost():
             #self.debug_print("cov_bits:{},{}".format(self.coverage_bits, type(self.coverage_bits)))
         else:
             self.coverage_bits = self.cov_output.value
+
+    def check_pc_eq(self): # check pc for equal validity and values (if valid)
+        if self.pc_valid_a.value != self.pc_valid_b.value:
+            self.debug_print('[RTLHost] PC validity difference a: {} b: {}'.format(self.pc_valid_a.value, self.pc_valid_b.value))
+            self.debug_print('[RTLHost] PC values a: {} b: {}'.format(hex(int(self.pc_a.value)), hex(int(self.pc_b.value))))
+            return False
+        elif self.pc_valid_a.value and self.pc_a.value != self.pc_b.value:
+            self.debug_print('[RTLHost] PC value difference a: {} b: {}'.format(hex(int(self.pc_a.value)), hex(int(self.pc_b.value))))
+            return False
+        return True
 
     def save_signature(self, memory, sig_start, sig_end, data_addrs, sig_file):
         fd = open(sig_file, 'w')
@@ -211,10 +227,14 @@ class rvRTLhost():
 
         assert self.cov_output.value == self.cov_reset_val, 'coverage not reset {}'.format(self.cov_output.value)
 
+        leak = False
+
         self.adapter.start(memory_a, memory_b, ints)
         for i in range(max_cycles):
             yield clkedge
             self.cov_gen()
+            pc_equal = self.check_pc_eq()
+            leak = leak or not pc_equal
             if i % 100 == 0:
                 tohost_a = memory_a[tohost_addr]
                 tohost_b = memory_b[tohost_addr] 
@@ -231,14 +251,18 @@ class rvRTLhost():
         clk_driver.kill()
         self.debug_print('[RTLHost] End of RTL simulation')
 
+        self.debug_print('[RTLHost] PC leak: {}'.format(leak))
 
         if (tohost_a and not tohost_b) or (not tohost_a and tohost_b): #one finished earlier
-            self.debug_print('[RTLHost] Observed timing leak')
+            self.debug_print('[RTLHost] HTIF observed timing leak')
             return_val = LEAK
 
         elif tohost_a and tohost_b: #both finished in the same 100 cycle batch
-            self.debug_print('[RTLHost] Observations equal')
-            return_val = NO_LEAK
+            self.debug_print('[RTLHost] HTIF observations equal')
+            if leak:
+                return_val = LEAK
+            else:
+                return_val = NO_LEAK
         
         else: # none finished in time timed out (this should only happen if a program take unforseen many cycles per instruction)
             self.debug_print('[RTLHost] Timeout, max_cycle={}'.format(max_cycles))

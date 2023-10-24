@@ -19,9 +19,9 @@ def Minimize(target,
     proc_num = 0
 
     if target == 'Rocket':
-        toplevel, bin_dir, v_file = ROCKET_CONF
+        toplevel, bin_dir, v_file, cov_len = ROCKET_CONF
     else:
-        toplevel, bin_dir, v_file = BOOM_CONF
+        toplevel, bin_dir, v_file, cov_len = BOOM_CONF
 
     (mutator, preprocessor, hscHost) = \
         setupHSC(template, out, proc_num, debug, contract, isa)

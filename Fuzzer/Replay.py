@@ -19,10 +19,10 @@ def Replay(target, in_file=None,
             '{} is not toplevel'.format(target)
         proc_num = 0
 
-        if target == 'Rocket':
-            toplevel, bin_dir, v_file = ROCKET_CONF
-        else:
-            toplevel, bin_dir, v_file = BOOM_CONF
+    if target == 'Rocket':
+        toplevel, bin_dir, v_file, cov_len = ROCKET_CONF
+    else:
+        toplevel, bin_dir, v_file, cov_len = BOOM_CONF
 
 
 

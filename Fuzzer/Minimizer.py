@@ -120,7 +120,7 @@ def Minimize(target,
                         if ret == proc_state.ERR_HSC_TIMEOUT: continue # this should not happen as execution time with no-ops should be lower
                         if ret == proc_state.ERR_CONTR_DIST:
                             print('[Minimizer] {} minimize leads to contr dist'.format(siName))
-                            break# this should not happen as replacing a command with no-ops should lead to less leakage
+                            continue # this can happen as e.g. control flow can change, however in this case does not help with minimization
                         if ret == proc_state.ERR_HSC_ASSERT: # this should not happen as replacing a command with no-ops should not lead to faults
                             print('[Minimizer] {} minimize leads to Sail non-zero exit'.format(siName))
                             break

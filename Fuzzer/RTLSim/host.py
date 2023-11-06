@@ -121,7 +121,8 @@ class rvRTLhost():
     
     def cov_gen(self):
         idx = int.from_bytes(shake_128(self.cov_output.value.buff).digest(3), byteorder='big')
-        self.debug_print('idx: {}'.format(idx ^ self.last_idx))
+        # comment in to debug coverage
+        #self.debug_print('idx: {}'.format(idx ^ self.last_idx))
         self.coverage_map[idx ^ self.last_idx] = 1
         self.last_idx = idx >> 1
 

@@ -1,0 +1,6 @@
+t: Rocket, c: seq-ct-b, i: RV64IM, x: 11
+t: Rocket, c: seq-ct-b, i: RV64IM, x: 3
+t: Rocket, c: seq-ct-b, i: RV64IM, x: 2
+t: Rocket, c: seq-ct-b, i: RV64IM, x: 4
+t: Rocket, c: seq-ct-b, i: RV64IM, x: 3
+----------------------

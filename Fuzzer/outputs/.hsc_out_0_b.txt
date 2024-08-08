@@ -1,0 +1,949 @@
+Leakage:
+Leak: IMM 0x0
+Leak: RD 0x5
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0x20
+Leak: RS1 0x5
+Leak: RD 0xb
+Leak: OP 0x13
+Leakage:
+Leakage:
+Leak: IMM 0x18
+Leak: RS1 0x5
+Leak: RD 0x5
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x0
+Leak: RS1 0x5
+Leak: RD 0x0
+Leakage:
+Leak: IMM 0x10
+Leak: RD 0x1f
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0x0
+Leak: RS1 0x1f
+Leak: RD 0x1f
+Leak: OP 0x13
+Leakage:
+Leak: IMM 0x0
+Leak: RS1 0x1f
+Leak: RD 0x1
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x8
+Leak: RS1 0x1f
+Leak: RD 0x2
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x10
+Leak: RS1 0x1f
+Leak: RD 0x3
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x18
+Leak: RS1 0x1f
+Leak: RD 0x4
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x20
+Leak: RS1 0x1f
+Leak: RD 0x5
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x28
+Leak: RS1 0x1f
+Leak: RD 0x6
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x30
+Leak: RS1 0x1f
+Leak: RD 0x7
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x38
+Leak: RS1 0x1f
+Leak: RD 0x8
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x40
+Leak: RS1 0x1f
+Leak: RD 0x9
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x48
+Leak: RS1 0x1f
+Leak: RD 0xa
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x50
+Leak: RS1 0x1f
+Leak: RD 0xb
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x58
+Leak: RS1 0x1f
+Leak: RD 0xc
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x60
+Leak: RS1 0x1f
+Leak: RD 0xd
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x68
+Leak: RS1 0x1f
+Leak: RD 0xe
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x70
+Leak: RS1 0x1f
+Leak: RD 0xf
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x78
+Leak: RS1 0x1f
+Leak: RD 0x10
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x80
+Leak: RS1 0x1f
+Leak: RD 0x11
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x88
+Leak: RS1 0x1f
+Leak: RD 0x12
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x90
+Leak: RS1 0x1f
+Leak: RD 0x13
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x98
+Leak: RS1 0x1f
+Leak: RD 0x14
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0xa0
+Leak: RS1 0x1f
+Leak: RD 0x15
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0xa8
+Leak: RS1 0x1f
+Leak: RD 0x16
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0xb0
+Leak: RS1 0x1f
+Leak: RD 0x17
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0xb8
+Leak: RS1 0x1f
+Leak: RD 0x18
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0xc0
+Leak: RS1 0x1f
+Leak: RD 0x19
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0xc8
+Leak: RS1 0x1f
+Leak: RD 0x1a
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0xd0
+Leak: RS1 0x1f
+Leak: RD 0x1b
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0xd8
+Leak: RS1 0x1f
+Leak: RD 0x1c
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0xe0
+Leak: RS1 0x1f
+Leak: RD 0x1d
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0xe8
+Leak: RS1 0x1f
+Leak: RD 0x1e
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0xf0
+Leak: RS1 0x1f
+Leak: RD 0x1f
+Leak: OP 0x183
+Leakage:
+Leak: IMM 0x2f4
+Leak: RD 0x0
+Leakage:
+Leakage:
+Leakage:
+Leak: B_TAKEN 0x0
+Leak: IMM 0x0
+Leak: RS2 0x0
+Leak: RS1 0xa
+Leak: OP 0xe3
+Leakage:
+Leak: IMM 0x0
+Leak: RD 0x5
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0x18
+Leak: RS1 0x5
+Leak: RD 0x5
+Leak: OP 0x13
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leak: IMM 0x0
+Leak: RD 0x5
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0x10
+Leak: RS1 0x5
+Leak: RD 0x5
+Leak: OP 0x13
+Leakage:
+Leakage:
+Leakage:
+Leak: IMM 0x0
+Leak: RD 0x5
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0x24
+Leak: RS1 0x5
+Leak: RD 0x5
+Leak: OP 0x13
+Leakage:
+Leakage:
+Leak: IMM 0x1
+Leak: RS1 0x0
+Leak: RD 0x5
+Leakage:
+Leak: IMM 0x35
+Leak: RS1 0x5
+Leak: RD 0x5
+Leak: OP 0x93
+Leakage:
+Leak: IMM 0xfff
+Leak: RS1 0x5
+Leak: RD 0x5
+Leak: OP 0x13
+Leakage:
+Leakage:
+Leak: IMM 0x1f
+Leak: RS1 0x0
+Leak: RD 0x5
+Leak: OP 0x13
+Leakage:
+Leakage:
+Leak: IMM 0x0
+Leak: RD 0x5
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0xd64
+Leak: RS1 0x5
+Leak: RD 0x5
+Leak: OP 0x13
+Leakage:
+Leakage:
+Leak: IMM 0x0
+Leak: RS1 0x0
+Leak: RD 0x3
+Leak: OP 0x13
+Leakage:
+Leak: IMM 0x1
+Leak: RS1 0x0
+Leak: RD 0xa
+Leak: OP 0x13
+Leakage:
+Leak: IMM 0x1f
+Leak: RS1 0xa
+Leak: RD 0xa
+Leak: OP 0x93
+Leakage:
+Leak: B_TAKEN 0x1
+Leak: IMM 0x18
+Leak: RS2 0x0
+Leak: RS1 0xa
+Leak: OP 0x2e3
+Leakage:
+Leak: IMM 0x0
+Leak: RD 0x5
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0xd14
+Leak: RS1 0x5
+Leak: RD 0x5
+Leak: OP 0x13
+Leakage:
+Leakage:
+Leak: IMM 0xb
+Leak: RD 0x5
+Leak: OP 0x37
+Leakage:
+Leak: IMM 0x109
+Leak: RS1 0x5
+Leak: RD 0x5
+Leakage:
+Leakage:
+Leak: IMM 0x6
+Leak: RD 0xa
+Leak: OP 0x37
+Leakage:
+Leakage:
+Leakage:
+Leak: IMM 0x1ffc64
+Leak: RD 0x1
+Leakage:
+Leak: IMM 0x20
+Leak: RD 0x1f
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0xf78
+Leak: RS1 0x1f
+Leak: RD 0x1f
+Leak: OP 0x13
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leak: IMM 0x0
+Leak: RS1 0x1
+Leak: RD 0x0
+Leakage:
+Leakage:
+Leakage:
+Leak: IMM 0x0
+Leak: RD 0x5
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0x50
+Leak: RS1 0x5
+Leak: RD 0x5
+Leak: OP 0x13
+Leakage:
+Leakage:
+Leak: IMM 0x0
+Leak: RS1 0x0
+Leak: RD 0x5
+Leak: OP 0x13
+Leakage:
+Leakage:
+Leak: B_TAKEN 0x0
+Leak: IMM 0x1e8
+Leak: RS2 0x10
+Leak: RS1 0x1a
+Leak: OP 0x63
+Leakage:
+Leak: RS2 0x19
+Leak: RS1 0x1a
+Leak: RD 0x7
+Leak: OP 0x7b3
+Leakage:
+Leak: IMM 0x0
+Leak: RS1 0xe
+Leak: RD 0x14
+Leak: OP 0x113
+Leakage:
+Leak: IMM 0x0
+Leak: RD 0x11
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0xf0
+Leak: RS1 0x11
+Leak: RD 0x11
+Leak: OP 0x13
+Leakage:
+Leak: IMM 0x4
+Leak: RS1 0x11
+Leak: RD 0xe
+Leak: OP 0x303
+Leakage:
+Leak: RS2 0x15
+Leak: RS1 0x9
+Leak: RD 0x19
+Leak: OP 0x633
+Leakage:
+Leak: IMM 0x1e4
+Leak: RD 0x1b
+Leakage:
+Leakage:
+Leak: IMM 0x0
+Leak: RD 0x1d
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0xf04
+Leak: RS1 0x1d
+Leak: RD 0x1d
+Leak: OP 0x13
+Leakage:
+Leak: IMM 0x1a
+Leak: RS1 0x1d
+Leak: RD 0x1b
+Leak: OP 0x3
+Leakage:
+Leak: IMM 0x14
+Leak: RD 0x1e
+Leakage:
+Leak: B_TAKEN 0x1
+Leak: IMM 0x4
+Leak: RS2 0xc
+Leak: RS1 0x5
+Leak: OP 0x363
+Leakage:
+Leakage:
+Leak: RS2 0x12
+Leak: RS1 0x18
+Leak: RD 0x7
+Leak: OP 0x6bb
+Leakage:
+Leak: RS2 0xa
+Leak: RS1 0x12
+Leak: RD 0x5
+Leak: OP 0x6b3
+Leakage:
+Leak: RS2 0x19
+Leak: RS1 0xa
+Leak: RD 0x1c
+Leakage:
+Leak: B_TAKEN 0x1
+Leak: IMM 0x4
+Leak: RS2 0x11
+Leak: RS1 0xf
+Leak: OP 0x263
+Leakage:
+Leak: IMM 0x50
+Leak: RD 0x1e
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0xf0c
+Leak: RS1 0x1e
+Leak: RD 0x1e
+Leak: OP 0x13
+Leakage:
+Leak: IMM 0xffc
+Leak: RS1 0x1e
+Leak: RD 0x13
+Leak: OP 0x103
+Leakage:
+Leakage:
+Leak: IMM 0x2
+Leak: RD 0x1
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0xcc
+Leak: RS1 0x1
+Leak: RD 0x1
+Leak: OP 0x13
+Leakage:
+Leakage:
+Leak: IMM 0x58
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x70
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x78
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x80
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x88
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x90
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x98
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0xa0
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0xf7f
+Leak: RS1 0x2
+Leak: RD 0x2
+Leak: OP 0x393
+Leakage:
+Leak: IMM 0xa8
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0xb0
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0xb8
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0xc0
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0xc8
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0xd0
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0xd8
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0xe0
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0xe8
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0xf0
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0xf8
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x100
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x108
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0xf7f
+Leak: RS1 0x2
+Leak: RD 0x2
+Leak: OP 0x393
+Leakage:
+Leak: IMM 0x110
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x118
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x138
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x140
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x148
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x150
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x158
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x160
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x168
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x170
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x6
+Leak: RD 0xa
+Leak: OP 0x37
+Leakage:
+Leakage:
+Leakage:
+Leak: IMM 0x40
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x48
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leakage:
+Leak: IMM 0x50
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x2
+Leak: RD 0x1
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0xda4
+Leak: RS1 0x1
+Leak: RD 0x1
+Leak: OP 0x13
+Leakage:
+Leak: IMM 0x0
+Leak: RS2 0x0
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x10
+Leak: RS2 0x2
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x18
+Leak: RS2 0x3
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x20
+Leak: RS2 0x4
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x28
+Leak: RS2 0x5
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x30
+Leak: RS2 0x6
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x38
+Leak: RS2 0x7
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x40
+Leak: RS2 0x8
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x48
+Leak: RS2 0x9
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x50
+Leak: RS2 0xa
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x58
+Leak: RS2 0xb
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x60
+Leak: RS2 0xc
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x68
+Leak: RS2 0xd
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x70
+Leak: RS2 0xe
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x78
+Leak: RS2 0xf
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x80
+Leak: RS2 0x10
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x88
+Leak: RS2 0x11
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x90
+Leak: RS2 0x12
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x98
+Leak: RS2 0x13
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0xa0
+Leak: RS2 0x14
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0xa8
+Leak: RS2 0x15
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0xb0
+Leak: RS2 0x16
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0xb8
+Leak: RS2 0x17
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0xc0
+Leak: RS2 0x18
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0xc8
+Leak: RS2 0x19
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0xd8
+Leak: RS2 0x1b
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0xe0
+Leak: RS2 0x1c
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0xe8
+Leak: RS2 0x1d
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0xf0
+Leak: RS2 0x1e
+Leak: RS1 0x1
+Leak: OP 0x1a3
+Leakage:
+Leak: IMM 0x2
+Leak: RD 0x1
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0xe28
+Leak: RS1 0x1
+Leak: RD 0x1
+Leak: OP 0x13
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leak: IMM 0x2
+Leak: RD 0x1
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0xde4
+Leak: RS1 0x1
+Leak: RD 0x1
+Leak: OP 0x13
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leakage:
+Leak: IMM 0x1
+Leak: RS1 0x0
+Leak: RD 0x3
+Leak: OP 0x13
+Leakage:
+Leak: IMM 0x1
+Leak: RD 0x1e
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0xc94
+Leak: RS2 0x3
+Leak: RS1 0x1e
+Leak: OP 0x123
+Leakage:
+Leak: IMM 0x1ffff4
+Leak: RD 0x0
+Leakage:
+Leak: IMM 0x1
+Leak: RS1 0x0
+Leak: RD 0x3
+Leak: OP 0x13
+Leakage:
+Leak: IMM 0x1
+Leak: RD 0x1e
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0xc94
+Leak: RS2 0x3
+Leak: RS1 0x1e
+Leak: OP 0x123
+Leakage:
+Leak: IMM 0x1ffff4
+Leak: RD 0x0
+Leakage:
+Leak: IMM 0x1
+Leak: RS1 0x0
+Leak: RD 0x3
+Leak: OP 0x13
+Leakage:
+Leak: IMM 0x1
+Leak: RD 0x1e
+Leak: OP 0x17
+Leakage:
+Leak: IMM 0xc94
+Leak: RS2 0x3
+Leak: RS1 0x1e
+Leak: OP 0x123

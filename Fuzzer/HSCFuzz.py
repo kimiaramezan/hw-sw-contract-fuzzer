@@ -43,7 +43,7 @@ parser = argparse.ArgumentParser(prog="HSCFuzz",
 parser.add_argument('-t', '--target', help='DUT: Rocket/BOOM')
 parser.add_argument('-c', '--contract', default='ct', help='HW-SW contract to check')
 parser.add_argument('-i', '--isa', default='RV64I', help='RISC-V ISA subset to use')
-parser.add_argument('-n', '--num_iter', type=int, help='The number of fuzz iterations')
+#parser.add_argument('-n', '--num_iter', type=int, help='The number of fuzz iterations')
 parser.add_argument('-o', '--output', help='Directory to save the result')
 parser.add_argument('-v', '--verbose', action='store_true', help='Verbose logging')
 parser.add_argument('-r', '--replay', default=None, help='SimInput to replay')
@@ -133,6 +133,6 @@ else:
     if args.minimize:
         Minimize(args.target, out=out, contract=args.contract, isa=args.isa, debug=args.verbose) 
     else:
-        Fuzz(args.target, num_iter=args.num_iter, out=out, cov_log=cov_log,
+        Fuzz(args.target , out=out, cov_log=cov_log,
             contract=args.contract, isa=args.isa, trace_log=trace_log, 
             debug=args.verbose, cores=args.multi)

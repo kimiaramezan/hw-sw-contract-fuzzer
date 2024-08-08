@@ -11,7 +11,7 @@ from src.multicore_manager import proc_state
 from Config import ROCKET_CONF, BOOM_CONF, DATA_GUIDANCE, Feedback, FEEDBACK
 
 
-def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, record=True,
+def Fuzz(target, template='Template', in_file=None, debug=True, record=True,
         out='output', cov_log=None, contract='ct', isa='RV64I', trace_log=None, cores=0):
     
     assert target in ['Rocket', 'Boom' ], \
@@ -31,8 +31,8 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
     (mutator, preprocessor, hscHost) = \
         setupHSC(template, out, proc_num, debug, contract, isa, FEEDBACK == Feedback.NO_FB)
 
-    if in_file: num_iter = 1
-
+    #if in_file: num_iter = 1
+    num_iter=1
     stop = [ proc_state.NORMAL ]
     lNum = 0
     cNum = 0
@@ -49,6 +49,10 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
     # number of retrieved fuzzing jobs
     rt = 0
 
+    flag = True
+    first = 0
+
+
     if cores == 0:
         cores = os.cpu_count()
     executor = ProcessPoolExecutor (max_workers=cores)
@@ -57,6 +61,8 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
 
     gen_done = False
     sim_tasks = 0
+
+    temp = 0
     while not gen_done or rt < sim_tasks:
 
         assert_intr = False
@@ -81,6 +87,8 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
                 if ret == proc_state.ERR_HSC_TIMEOUT: 
                     save_mismatch(out, out + '/hsc_timeout', it, htNum)
                     htNum += 1
+                    # if flag:
+                    #     first += 1
                     debug_print('[HSCHost] timeout', debug, True)
                     continue
                 elif ret == proc_state.ERR_CONTR_DIST: 
@@ -89,23 +97,44 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
                     cdNum += 1
                     debug_print('[HSCHost] contract distinguishable', debug, True)
                     it += 1 # we only want ever want to generate it many inputs
-                    if it == num_iter:
-                        gen_done = True
+                    num_iter += 1
+                    #if flag:
+                        #first += 1
                     continue
                 elif ret == proc_state.ERR_RV_EXC:
                     cleanup(rtl_input) # discard RISC-V-exception-triggering input
                     debug_print('[HSCHost] input triggers RISC-V exception', debug, True)
+                    # if flag:
+                    #     first += 1
                     continue
                 elif ret == proc_state.ERR_HSC_ASSERT: # exit, temporary files stay available to debug sail
                     debug_print('[HSCHost] non-zero exit code', debug, True)
+                    # if flag:
+                    #     first += 1
                     break
-                
+            
                 f = executor.submit(run_rtl_test, bin_dir, v_file, toplevel, rtl_input, it, sim_input)
                 futures.append(f)
-                it += 1
-                sim_tasks += 1
-                if it == num_iter:
+
+                (ret1, cov_map1, run_id1, run_input1) = f.result()
+                if ret1 == LEAK: 
+                    temp = 1
                     gen_done = True
+                    break
+
+
+                # f1 = as_completed(f)
+                #(ret1, cov_map1, run_id1, run_input1) = f.result()
+                #if ret1 == LEAK: 
+                    
+                    #flag = False
+                #elif flag:
+                    #first += 1
+
+
+                it += 1
+                num_iter += 1
+                sim_tasks += 1
 
             mutator.update_phase(sim_tasks)
 
@@ -117,6 +146,9 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
                 debug_print('[RTLHost] exception {}'.format(run_id), debug, True)
                 stop[0] = proc_state.ERR_RTL_SIM
                 break
+            
+            
+            
             
             #TODO maybe adapt to interrupts
             # if assert_intr and ret == NO_LEAK:
@@ -149,8 +181,9 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
 
                 lNum += 1
 
-                debug_print('[HSCFuzz] Bug #{}-- {} [Leakage]'. \
+                debug_print('[HSCFuzz] Bug #{}-- {}'. \
                             format(lNum, run_id), debug, True)
+                
                 
             elif ret == TIME_OUT:
 
@@ -195,6 +228,10 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
 
             futures.remove(f)
             rt += 1
+
+        if temp == 1:
+            break
+        
         
         debug_print('[HSCFuzz] Retrieving [{}]'.format(rt), debug)
         
@@ -203,4 +240,5 @@ def Fuzz(target, num_iter=1, template='Template', in_file=None, debug=True, reco
     print('[HSCFuzz] Stop Fuzzing, total {} cov_points'.format(last_coverage.count(1)))
     print('[HSCFuzz] {} sim, {} dist, {} leak'.format(rt, cdNum, lNum))
     print('[HSCFuzz] {} cov, {} rto'.format(cNum, rtNum))
+    #print(first)
 

@@ -5,6 +5,8 @@ from cocotb.decorators import coroutine
 from cocotb.triggers import Timer, RisingEdge
 from bitarray import bitarray
 from hashlib import shake_128
+import hashlib
+import xxhash
 from itertools import repeat
 from reader.tile_reader import tileSrcReader
 from adapters.tile_adapter import tileAdapter
@@ -121,8 +123,11 @@ class rvRTLhost():
     
     def cov_gen(self):
         idx = int.from_bytes(shake_128(self.cov_output.value.buff).digest(3), byteorder='big')
+
+
         # comment in to debug coverage
         #self.debug_print('idx: {}'.format(idx ^ self.last_idx))
+        
         self.coverage_map[idx ^ self.last_idx] = 1
         self.last_idx = idx >> 1
 

@@ -169,6 +169,7 @@ def run_rtl_test(bin_dir, v_file, toplevel, sim_input_name, id, sim_input):
     if leak:
         save_leak(dir, dir + '/leaks', id, id)
 
+
     os.remove(cov_out)
     os.remove(sim_input_name)
     os.remove(os.path.join(dir, fname + '_a.S'))
